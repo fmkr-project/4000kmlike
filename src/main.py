@@ -1,4 +1,6 @@
 import game
 
-running = True
-game = game.Game()
+
+if __name__ == '__main__':
+    game = game.Game()
+    game.run()
