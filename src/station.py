@@ -1,7 +1,12 @@
 class StaManager:
     def __init__(self, game):
         self.game = game
-        self.list_of_stas = []
+        self.stalist = []
+        
+        # Initialize station list
+        for sta in self.game.data.execute("select * from station").fetchall():
+            self.stalist.append(Station(sta[0], sta[1], None))
+
 
 class Station:
     def __init__(self, id, name, coords):
