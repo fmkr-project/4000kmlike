@@ -14,5 +14,5 @@ class Logger():
 
     def dump(self, message):
         """Flush a message to the dump file"""
-        self.file.write(f"[{self.get_timestamp()}] - {message}\n")
+        self.file.write(f"[{time.strftime('%H.%M.%S')} @ {self.get_timestamp():.3f}] - {message}\n")
         self.file.flush()

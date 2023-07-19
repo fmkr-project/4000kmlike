@@ -23,7 +23,11 @@ class ServManager():
             if stanum < len(serv.teisya):
                 self.game.logger.dump(f"[WARNING] in service of id {serv.id}: too many stops ({len(serv.stops)}) for path of len {stanum}")
             if len(serv.jifun) != 2 * (stanum - 1):
-                self.game.logger.dump(f"[WARNING] in service of id {serv.id}: incorrect format for times, expected [D, A, D, ... A, D, A]")
+                self.game.logger.dump(f"[WARNING] in service of id {serv.id}: incorrect format for times, expected alternating A and D times")
+            
+            for sta in serv.teisya:
+                if sta not in serv.keiro:
+                    self.game.logger.dump(f"[WARNING] in service of id {serv.id}: station id {sta} does not belong to the path")
             
             # times in ascending order
             for i in range(len(serv.jifun)-1):
@@ -35,6 +39,10 @@ class ServManager():
             for sta in serv.keiro:
                 if sta not in self.game.sta_manager.stalist_by_id():
                     self.game.logger.dump(f"[WARNING] in service of id {serv.id}: unknown station id {sta}")
+            for i in range(len(serv.keiro)-1):
+                if not self.game.path_manager.has_path(serv.keiro[i], serv.keiro[i+1]):
+                    self.game.logger.dump(f"[WARNING] in service of id {serv.id}: no path between {serv.keiro[i]} and {serv.keiro[i+1]}")
+                # TODO bus etc
 
         # Service continuity check
         for comp in self.get_comps():
@@ -66,6 +74,10 @@ class Service():
         except:
             self.mg.game.logger.dump(f"[ERROR] in times: expected type list, found {times}")
         self.renketu = link
+
+        self.path = self.mg.game.path_manager.build_path(self.keiro)
+
+        
     
     def merge(self, serv2):
         self.keiro.extend(serv2.keiro)
