@@ -5,6 +5,7 @@ import path
 import service
 import log
 import clock
+import player
 
 
 
@@ -21,6 +22,8 @@ class Game:
         self.sta_manager = station.StaManager(self)
         self.path_manager = path.PathManager(self)
         self.serv_manager = service.ServManager(self)
+
+        self.player = player.Player(self)
 
         # Integrity checks
         self.path_manager.integrity_check()
