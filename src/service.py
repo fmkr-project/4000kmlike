@@ -1,3 +1,6 @@
+from collections import OrderedDict
+
+
 class ServManager():
     def __init__(self, game):
         self.game = game
@@ -5,7 +8,12 @@ class ServManager():
 
         # Initialize service list
         for serv in self.game.data.execute("select * from service").fetchall():
-            self.servlist[serv[0]] = Service(self, serv[0], serv[1], serv[2], serv[3],serv[4], serv[5], serv[6], serv[7], serv[8])
+            # Buffer lines
+            if serv[6] in (None, "") and serv[7] in (None, "") and serv[8] in (None, ""):
+                self.game.logger.dump(f"[INFO] skipping service {serv[0]} as it has no data (buffer line)")
+                continue
+            new = Service(self, serv[0], serv[2], serv[3], serv[4],serv[5], serv[6], serv[7], serv[8], serv[9])
+            self.servlist[serv[0]] = new
 
     def get_comps(self):
         """Get list of compositions"""
@@ -32,6 +40,8 @@ class ServManager():
                     self.game.logger.dump(f"[WARNING] in service of id {serv.id}: station id {sta} does not belong to the path")
             
             # times in ascending order
+            # TODO #3 yakou
+            # TODO #2 use ordereddict structure
             for i in range(len(serv.jifun)-1):
                 if serv.jifun[i] > serv.jifun[i+1]:
                     self.game.logger.dump(f"[WARNING] in service of id {serv.id}: time {serv.jifun[i]} is before time {serv.jifun[i+1]}")
@@ -39,6 +49,12 @@ class ServManager():
             for i in range(1, stopnum-1):
                 if serv.jifun[1 + (i-1)*2] == serv.jifun[i*2]:
                     self.game.logger.dump(f"[WARNING] in service of id {serv.id}: station id {serv.teisya[i]} has stopping time of 0 (@{serv.jifun[i*2]}), will be skipped")
+
+        # Times check
+        for serv in self.servlist.values():
+            for time in serv.jifun:
+                if (time // 10000 not in range(0,24) or (time % 10000) // 100 not in range(0,60) or time % 100 not in range(0,60)):
+                    self.game.logger.dump(f"[WARNING] in service of id {serv.id}: time {time} does not match format [h]hmmss")
 
         # Path check
         for serv in self.servlist.values():
@@ -77,6 +93,10 @@ class Service():
         
         try:
             self.jifun = eval(times)
+            # Convert from hmm / hhmm to hmmss / hhmmss
+            for time in self.jifun:
+                if time in range(0, 9999):
+                    time *= 100
         except:
             self.mg.game.logger.dump(f"[ERROR] in times: expected type list, found {times}")
         self.renketu = link
@@ -86,6 +106,18 @@ class Service():
         self.ki = self.mg.game.sta_manager.get_sta_by_id(self.keiro[0])
         self.syu = self.mg.game.sta_manager.get_sta_by_id(self.keiro[-1])
         self.keiyu = self.mg.game.path_manager.build_linenames(self.mg.game.path_manager.build_path(self.keiro))
+
+        # Construct dict of stops with A and D times
+        # TODO sta that are passed
+        self.staph = OrderedDict()
+        for tei in range(len(self.teisya)):
+            if tei == 0:
+                self.staph[self.teisya[0]] = (-1, self.jifun[0])
+            elif tei == len(self.teisya) - 1:
+                self.staph[self.teisya[-1]] = (self.jifun[-1], -1)
+            else:
+                self.staph[self.teisya[tei]] = (self.jifun[1+(tei-1)*2], self.jifun[2*tei])
+    
 
         
     
