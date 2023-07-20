@@ -18,7 +18,7 @@ class Clock():
         self.day = 1
         self.season = None
 
-        self.hour = 0
+        self.hour = 5
         self.minute = 0
         self.second = 0
 
