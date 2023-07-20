@@ -10,7 +10,8 @@ import player
 
 
 class Game:
-    RESDB_LOCATION = "res/game_data.db"
+    #RESDB_LOCATION = "res/game_data.db" # TODO #1 load other dbs
+    RESDB_LOCATION = "res/tsugaru.db"
     TICKS_PER_SECOND = 60
 
     def __init__(self):
