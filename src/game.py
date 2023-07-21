@@ -20,13 +20,25 @@ class Game:
 
     def __init__(self):
         self.logger = log.Logger(self)
+        self.logger.dump("Launching")
         
         # GUI
         pg.init()
+        self.logger.dump("pygame initialized")
+        self.logger.dump("Creating main window")
         self.main_window = window.MainWindow(self, self.MAIN_WINDOW_DEFAULT_SIZE[0], self.MAIN_WINDOW_DEFAULT_SIZE[1])
 
         # Internals
-        self.data = sql.connect(self.RESDB_LOCATION).cursor()
+        self.logger.dump("Connecting to database")
+        try:
+            self.data = sql.connect(self.RESDB_LOCATION).cursor()
+            # Control if all tables exist
+            self.data.execute("select * from station")
+            self.data.execute("select * from path")
+            self.data.execute("select * from service")
+        except sql.OperationalError:
+            self.logger.dump("[CRITICAL] Database file could not be found")
+            raise FileNotFoundError("Database file could not be found")
 
         self.clock = clock.Clock(self)
 
@@ -37,6 +49,7 @@ class Game:
         self.player = player.Player(self)
 
         # Integrity checks
+        self.logger.dump("Running integrity checks")
         self.path_manager.integrity_check()
         self.serv_manager.integrity_check()
 

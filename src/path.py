@@ -9,6 +9,7 @@ class PathManager():
 
     def integrity_check(self):
         """Check for anomalies in the pathlist"""
+        self.game.logger.dump(f"[INFO] Running integrity check for paths")
         # Isolated stas
         for sta in self.game.sta_manager.stalist_by_id():
             if sta not in [path.start for path in self.pathlist.values()] + [path.end for path in self.pathlist.values()]:
