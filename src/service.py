@@ -69,6 +69,21 @@ class ServManager():
         # Service continuity check
         for comp in self.get_comps():
             pass
+    
+    def get_serv_by_id(self, id):
+        return self.servlist[id]
+    
+    def get_deptimes(self, start, end):
+        """Given endpoints, get the list of every service going through them\n
+        Result should be a dict with services as keys and their dep times as values."""
+        depts = {}
+        for serv in self.servlist.values():
+            # Check if the path contains start followed by end
+            for sta in range(len(serv.teisya)-1):
+                if serv.teisya[sta] == start and serv.teisya[sta+1] == end:
+                    depts[serv.id] = serv.jifun[2*sta]
+        sorted_depts = dict(sorted(depts.items(), key=lambda x: x[1]))
+        return dict(zip(list(sorted_depts.keys()), list(sorted_depts.values())))
 
 
 class Service():

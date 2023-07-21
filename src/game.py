@@ -8,6 +8,7 @@ import log
 import clock
 import player
 import window
+import inputs
 
 
 
@@ -28,6 +29,13 @@ class Game:
         self.logger.dump("Creating main window")
         self.main_window = window.MainWindow(self, self.MAIN_WINDOW_DEFAULT_SIZE[0], self.MAIN_WINDOW_DEFAULT_SIZE[1])
 
+        # Flags
+        self.F_stmenu = True        # Generic menu at a Station. Game always starts at a station
+        self.F_jikoku = False       # Timetable menu
+        self.F_choice = False       # Choice in timetable menu
+        self.F_shinai = False       # City menu
+        self.F_syanai = False       # Train menu
+
         # Internals
         self.logger.dump("Connecting to database")
         try:
@@ -46,7 +54,10 @@ class Game:
         self.path_manager = path.PathManager(self)
         self.serv_manager = service.ServManager(self)
 
-        self.player = player.Player(self)
+        print(self.serv_manager.get_deptimes(0,100))
+        starting_sta = self.sta_manager.get_sta_by_id(0)    # TODO magic variable purge
+        self.sta_manager.get_neighbors(0)
+        self.player = player.Player(self, starting_sta)
 
         # Integrity checks
         self.logger.dump("Running integrity checks")
@@ -69,8 +80,31 @@ class Game:
 
         while self.running:
             self.tick()
+
+            # pg event management
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    self.running = False
+                elif event.type == pg.KEYDOWN:
+                    inputs.handle_key_down(self, event)
+        
             self.clock.pgclock.tick(self.TICKS_PER_SECOND)
+        
+        self.quit_game()
     
+
+    def quit_game(self):
+        """End game execution"""
+        self.logger.dump("Now exiting game...")
+        # DB connection closure
+        try:
+            self.data.close()
+        except sql.ProgrammingError:
+            self.logger.dump("[WARNING] Database is currently not accessible")
+        pg.display.quit()
+        pg.quit()
+        self.logger.dump("Game exit complete.")
+
 
     def update(self):
         """Update game information when time changes"""

@@ -14,6 +14,16 @@ class StaManager:
     def get_sta_by_id(self, id):
         """Get a Station object by its id"""
         return self.stalist[id]
+    
+    def get_neighbors(self, id):
+        """Return the list of all stas that have a path to the specified sta"""
+        data = self.game.data.execute(f"select end, name from path where start = {id} union select start, name from path where end = {id}").fetchall()
+        res = {}
+        for path in data:
+            # TODO There has to be a better way to do this
+            res[path[0]] = path[1]
+        return res
+
 
 class Station:
     def __init__(self, mg, id, name, coords):
