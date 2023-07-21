@@ -10,9 +10,15 @@ class Player:
         self.sta = sta
         self.serv = None
 
+        self.next_serv = None
+        self.using_line = None
+
         # Record attributes
         self.soukiro = 0
     
+
+    def update(self):
+        pass
 
     def gameover(self):
         """Check if the player can no longer continue"""

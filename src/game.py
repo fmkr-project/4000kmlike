@@ -34,7 +34,8 @@ class Game:
         self.F_jikoku = False       # Timetable menu
         self.F_choice = False       # Choice in timetable menu
         self.F_shinai = False       # City menu
-        self.F_syanai = False       # Train menu
+        self.F_soukou = False       # Train menu (between Stations)
+        self.F_teisya = False       # Train menu (at a Station)
 
         # Gameplay internals
         self.fast_forward = False
@@ -71,8 +72,9 @@ class Game:
 
     def tick(self):
         """Operations on tick change"""
-        self.main_window.update()
         self.clock.update()
+        self.main_window.update()
+        self.player.update()
 
     def run(self):
         """Main loop"""

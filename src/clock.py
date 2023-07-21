@@ -4,7 +4,7 @@ import pygame as pg
 
 class Clock():
     TIME_TICK = 25
-    TIME_TICK_ACCEL = 4
+    TIME_TICK_ACCEL = 3
     MONTH_LENGTHS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
     def __init__(self, game):
