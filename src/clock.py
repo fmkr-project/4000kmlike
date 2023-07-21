@@ -4,7 +4,7 @@ import pygame as pg
 
 class Clock():
     TIME_TICK = 25
-    TIME_TICK_ACCEL = 2
+    TIME_TICK_ACCEL = 4
     MONTH_LENGTHS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
     def __init__(self, game):
@@ -35,9 +35,10 @@ class Clock():
     def update(self):
         """Operations after a pygame tick"""
         self.ticks_since_timechange += 1
+        corrected_tick = self.TIME_TICK_ACCEL if self.game.fast_forward else self.TIME_TICK
 
         # Update time
-        if self.ticks_since_timechange >= self.TIME_TICK:
+        if self.ticks_since_timechange >= corrected_tick:
             self.ticks_since_timechange = 0
             self.second += 15
             if self.second >= 60:

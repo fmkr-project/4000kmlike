@@ -36,7 +36,10 @@ class Game:
         self.F_shinai = False       # City menu
         self.F_syanai = False       # Train menu
 
-        # Internals
+        # Gameplay internals
+        self.fast_forward = False
+
+        # Lower level internals
         self.logger.dump("Connecting to database")
         try:
             self.data = sql.connect(self.RESDB_LOCATION).cursor()
