@@ -26,7 +26,7 @@ class MainWindow():
         # "Arrow"
         self.artop = 0                      # Top boundary
         self.arbot = 0                      # Bottom boundary
-        self.arpos = 0                      # Current arrow position
+        self.arpos = None                   # Current arrow position
 
     
     def tick(self):
@@ -102,7 +102,7 @@ class MainWindow():
             self.lines = None
             self.dests = None
             self.arbot = 0
-            self.arpos = 0
+            self.arpos = None
         
         # Other connections menu
         if self.game.F_rrmenu:
@@ -136,11 +136,20 @@ class MainWindow():
             self.endpoints = (self.game.player.sta.id, list(self.neighbors.keys())[self.choice_dir])
             self.dts = self.game.serv_manager.get_deptimes(self.endpoints[0], self.endpoints[1])
             self.arbot = len(self.dts) - 1
+            # Initialize arrow position on opening
+            if self.arpos is None:
+                deltas = [time - self.game.clock.get_hms() // 100 for time in list(self.dts.values())]
+                for i in range(len(deltas)):
+                    deltas[i] = 9999 if deltas[i] < 0 else deltas[i]
+                self.arpos = deltas.index(min(deltas))
+
             for i in range(len(self.dts)): # TODO account for current time
                 # TODO find a way to make tabulations work properly (or use a monospace font)
                 self.screen.blit(self.genfont.render(f"{list(self.dts.values())[i]} > {self.game.serv_manager.get_serv_by_id(list(self.dts.keys())[i]).syu.name}", True, (255, 255, 255)), (30, 250 + 30*i))
             # Display "arrow"
             self.screen.blit(self.genfont.render('•', True, (255, 255, 255)), (10, 250 + 30*self.arpos))
+        else:
+            self.arpos = None
         
         # Pygame actions
         pg.display.flip()
@@ -160,7 +169,7 @@ class MainWindow():
         self.lines = None
         self.dests = None
         self.arbot = 0
-        self.arpos = 0
+        self.arpos = None
         self.game.F_choice = False
         self.game.F_jikoku = False
         self.game.F_stmenu = True
