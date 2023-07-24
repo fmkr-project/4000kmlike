@@ -60,7 +60,7 @@ class MainWindow():
         # Blit information when walking
         if self.game.player.F_wlking:
             if self.game.player.walking_dist >= 1000:
-                self.screen.blit(self.genfont.render(f">> {self.game.player.kukan[1].name} in {math.ceil(self.game.player.walking_dist / 100) / 10 * 1000} km", True, (255, 255, 255)), (10, 130))
+                self.screen.blit(self.genfont.render(f">> {self.game.player.kukan[1].name} in {math.ceil(self.game.player.walking_dist / 100) / 10:.1f} km", True, (255, 255, 255)), (10, 130))
             else:
                 self.screen.blit(self.genfont.render(f">> {self.game.player.kukan[1].name} in {math.ceil(self.game.player.walking_dist / 100) * 100} m", True, (255, 255, 255)), (10, 130))
 
@@ -111,7 +111,12 @@ class MainWindow():
             # Only include directions that can be accessed only on foot
             for dest in neighbors:
                 paths = self.game.path_manager.get_paths(self.game.player.sta.id, dest)
-                if [path.renraku for path in paths] != [0 for _ in paths]:
+                # Find shortest path
+                shortest = paths[0]
+                for path in paths:
+                    if path.kyori < shortest.kyori:
+                        shortest = path
+                if path.renraku != 0 or path.kyori <= self.game.player.MAX_WALKABLE_DISTANCE:
                     self.neighbors[dest] = neighbors[dest]
             self.dests = [self.game.sta_manager.get_sta_by_id(sta).name for sta in self.neighbors.keys()]
             # Blit text for every direction available
@@ -167,9 +172,13 @@ class MainWindow():
             self.game.logger.dump("[WARNING] wrong menu for submitting an outside connection (this should not happen)")
         self.game.player.kukan = (self.game.player.sta, self.game.sta_manager.get_sta_by_id(list(self.neighbors.keys())[choice]))
         self.game.player.F_wlking = True
-        # Get walking distance (there should be only one foot-only path)
+        # Get walking distance (~ shortest path)
         paths = self.game.path_manager.get_paths(self.game.player.sta.id, list(self.neighbors.keys())[choice])
-        self.game.player.walking_dist = int([path.kyori for path in paths if path.renraku == 1][0] * 1000)
+        shortest = paths[0]
+        for path in paths:
+            if path.kyori < shortest.kyori:
+                shortest = path
+        self.game.player.walking_dist = int(path.kyori * 1000)
         # Reset attributes
         self.game.F_rrmenu = False
         self.game.F_stmenu = False

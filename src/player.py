@@ -5,6 +5,7 @@ import copy
 class Player:
     WALKING_SPEED_KPH = 5
     WALKING_SPEED_PER_TURN = WALKING_SPEED_KPH / 3600 * 15 * 1000
+    MAX_WALKABLE_DISTANCE = 20.          # in km
 
     def __init__(self, game, sta):
         self.game = game
@@ -55,7 +56,6 @@ class Player:
                 self.sta = self.kukan[1]
                 self.game.F_teisya = True
                 self.kukan = self.serv.get_next_section(self.sta)
-                print(self.kukan)
                 if self.kukan is None:
                     self.alight()
                     return

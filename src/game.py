@@ -59,7 +59,6 @@ class Game:
         self.path_manager = path.PathManager(self)
         self.serv_manager = service.ServManager(self)
 
-        print(self.serv_manager.get_deptimes(0,100))
         starting_sta = self.sta_manager.get_sta_by_id(0)    # TODO magic variable purge
         self.sta_manager.get_neighbors(0)
         self.player = player.Player(self, starting_sta)
