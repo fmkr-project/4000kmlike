@@ -70,7 +70,7 @@ class Player:
                 self.game.F_soukou = True
         else:
             # Arrival of a Service
-            if self.next_at is not None and self.game.clock.get_hms() >= self.next_at:
+            if self.next_at is not None and self.game.clock.get_hms() >= self.next_at and self.game.clock.get_hms() <= self.next_dt:
                 # Update Player properties
                 # TODO manage termini
                 # TODO load new times
@@ -84,7 +84,7 @@ class Player:
                 self.game.F_teisya = True
             
             # Departure of a Service
-            if self.next_dt is not None and self.game.clock.get_hms() >= self.next_dt:
+            if self.next_dt is not None and self.game.clock.get_hms() >= self.next_dt and self.next_at is None:
                 # Update Player properties
                 self.next_dt = None
 

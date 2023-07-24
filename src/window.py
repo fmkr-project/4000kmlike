@@ -174,6 +174,10 @@ class MainWindow():
         self.game.F_rrmenu = False
         self.game.F_stmenu = False
         self.game.logger.dump(f"Taking outside connection to {self.game.player.kukan[1].name}, rem. {self.game.player.walking_dist}")
+        # Reset player flags
+        self.game.player.next_at = None
+        self.game.player.next_dt = None
+        self.game.player.serv = None
     
     def can_choose(self, tgt):
         """Check if the target choice in the timetable menu does not overflow"""
