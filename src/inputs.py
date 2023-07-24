@@ -31,10 +31,9 @@ def handle_key_down(game, event):
             game.logger.dump("Timetable menu now closed")
     
     # Timetable - Go back to directions
-    if event.key == pg.K_x:
-        if game.F_jikoku and game.F_choice:
-            game.F_choice = False
-            game.main_window.choice_dir = None
+    if event.key == pg.K_x and game.F_jikoku and game.F_choice:
+        game.F_choice = False
+        game.main_window.choice_dir = None
     
     # Timetable - Choose direction
     if event.key in numerics:
@@ -58,3 +57,8 @@ def handle_key_down(game, event):
     # Timetable - Validate choice
     if event.key == pg.K_RETURN and game.F_jikoku and game.F_choice:
         game.main_window.submit_dt()
+    
+
+    # Train (stop) - Alight
+    if event.key == pg.K_x and game.F_teisya:
+        game.player.alight()

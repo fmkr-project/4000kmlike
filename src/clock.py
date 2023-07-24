@@ -4,7 +4,7 @@ import pygame as pg
 
 class Clock():
     TIME_TICK = 25
-    TIME_TICK_ACCEL = 3
+    TIME_TICK_ACCEL = 2
     MONTH_LENGTHS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
     def __init__(self, game):
@@ -18,8 +18,8 @@ class Clock():
         self.day = 1
         self.season = None
 
-        self.hour = 5
-        self.minute = 0
+        self.hour = 6
+        self.minute = 15
         self.second = 0
 
     def set(self, h, m, s=0):
@@ -27,6 +27,15 @@ class Clock():
         self.hour = h
         self.minute = m
         self.second = s
+    
+    def format(self, timestamp):
+        """Format a timestamp (hhmm or hhmmss format) into hh:mm:ss format"""
+        if timestamp in range(0, 9999):
+            # hhmm
+            return f"{timestamp // 100:02}:{timestamp % 100:02}:00"
+        elif timestamp in range(10000, 999999):
+            # hhmmss
+            return f"{timestamp // 10000:02}:{timestamp % 10000 // 100:02}:{timestamp % 100:02}"
     
     def get_hms(self):
         """Return the current time in hhmmss format"""

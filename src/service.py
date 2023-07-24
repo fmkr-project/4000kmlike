@@ -71,17 +71,18 @@ class ServManager():
             pass
     
     def get_serv_by_id(self, id):
+        """Get a service by its id"""
         return self.servlist[id]
     
     def get_deptimes(self, start, end):
         """Given endpoints, get the list of every service going through them\n
-        Result should be a dict with services as keys and their dep times as values."""
+        Result should be a dict with services as keys and their dep times as values (display format : no ss)."""
         depts = {}
         for serv in self.servlist.values():
             # Check if the path contains start followed by end
             for sta in range(len(serv.teisya)-1):
                 if serv.teisya[sta] == start and serv.teisya[sta+1] == end:
-                    depts[serv.id] = serv.jifun[2*sta]
+                    depts[serv.id] = serv.jifun[2*sta] // 100               # Removing seconds
         sorted_depts = dict(sorted(depts.items(), key=lambda x: x[1]))
         return dict(zip(list(sorted_depts.keys()), list(sorted_depts.values())))
 
@@ -109,9 +110,7 @@ class Service():
         try:
             self.jifun = eval(times)
             # Convert from hmm / hhmm to hmmss / hhmmss
-            for time in self.jifun:
-                if time in range(0, 9999):
-                    time *= 100
+            self.jifun = [time * 100 for time in self.jifun if time in range(0, 9999)]
         except:
             self.mg.game.logger.dump(f"[ERROR] in times: expected type list, found {times}")
         self.renketu = link
@@ -133,10 +132,19 @@ class Service():
             else:
                 self.staph[self.teisya[tei]] = (self.jifun[1+(tei-1)*2], self.jifun[2*tei])
     
-
+    def get_next_section(self, sta):
+        """Get section starting with specified station"""
+        if sta.id == self.teisya[-1]:
+            # Case when sta is the terminal station
+            return None
+        for i in range(len(self.teisya)-1):
+            if self.teisya[i] == sta.id:
+                return (self.mg.game.sta_manager.get_sta_by_id(self.teisya[i]), self.mg.game.sta_manager.get_sta_by_id(self.teisya[i+1]))
+        return None
         
     
-    def merge(self, serv2):
+    def _merge(self, serv2):
+        """Internal function for service merging"""
         self.keiro.extend(serv2.keiro)
         del(self.teisya[-1])
         self.teisya.extend(serv2.teisya)

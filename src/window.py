@@ -36,21 +36,31 @@ class MainWindow():
         # Blit the day & time
         # TODO delete magic variables !!!
         self.screen.blit(self.genfont.render(f"{self.game.clock.day}", True, (255, 255, 255)), (10, 10))
-        self.screen.blit(self.genfont.render(f"{self.game.clock.hour:02d}:{self.game.clock.minute:02d}:{self.game.clock.second:02d}", True, (255, 255, 255)), (10, 40))
+        self.screen.blit(self.genfont.render(self.game.clock.format(self.game.clock.get_hms()), True, (255, 255, 255)), (10, 40))
         if self.game.fast_forward:
             self.screen.blit(self.genfont.render('F', True, (255, 255, 255)), (150, 25))
 
         # Blit the name of the player's position
         # TODO support for case sta is None (ie. serv is not None)
-        if self.game.player.sta is not None:
+        if self.game.player.sta is not None and (self.game.F_stmenu or self.game.F_teisya or self.game.F_jikoku):
             self.screen.blit(self.bigfont.render(f"@ {self.game.player.sta.name}", True, (255, 255, 255)), (10, 70))
-        elif self.game.player.serv is not None:
-            pass
+        elif self.game.player.serv is not None and self.game.F_soukou:
+            self.screen.blit(self.bigfont.render(f"{self.game.player.kukan[0].name} > {self.game.player.kukan[1].name}", True, (255, 255, 255)), (10, 70))
         
         # Blit the Service that will be used
-        next_serv = self.game.player.next_serv
-        if next_serv is not None:
-            self.screen.blit(self.genfont.render(f"{next_serv.ki.name} > {next_serv.syu.name} | dep. {next_serv.staph[self.game.player.sta.id][1]}", True, (255, 255, 255)), (10, 130))
+        next_serv = self.game.player.serv
+        if next_serv is not None and (self.game.F_stmenu or self.game.F_jikoku):
+            self.screen.blit(self.genfont.render(f"{next_serv.ki.name} > {next_serv.syu.name} | arr. {self.game.clock.format(next_serv.staph[self.game.player.sta.id][0])}", True, (255, 255, 255)), (10, 130))
+        elif next_serv is not None and self.game.F_teisya:
+            self.screen.blit(self.genfont.render(f"{next_serv.ki.name} > {next_serv.syu.name} | dep. {self.game.clock.format(next_serv.staph[self.game.player.sta.id][1])}", True, (255, 255, 255)), (10, 130))
+            self.screen.blit(self.genfont.render(f"next {self.game.player.kukan[1].name}", True, (255, 255, 255)), (10, 160))
+
+        # Blit general information when boarding a Service
+        if self.game.F_soukou:
+            ki = self.game.player.serv.ki
+            syu = self.game.player.serv.syu
+            self.screen.blit(self.genfont.render(f"{ki.name} {self.game.clock.format(self.game.player.serv.staph[ki.id][1])} > {syu.name} {self.game.clock.format(self.game.player.serv.staph[syu.id][0])}", True, (255, 255, 255)), (10, 130))
+            self.screen.blit(self.genfont.render(f"{self.game.player.kukan[1].name} arr. {self.game.clock.format(self.game.player.serv.staph[self.game.player.kukan[1].id][0])}", True, (255, 255, 255)), (10, 160))
 
         # Station menu
         if self.game.F_stmenu:
@@ -78,6 +88,11 @@ class MainWindow():
             self.arbot = 0
             self.arpos = 0
         
+        # Train menu (at a Station)
+        if self.game.F_teisya:
+            # Display commands
+            self.screen.blit(self.genfont.render("x: alight", True, (255, 255, 255)), (350, 10))
+        
         # Departure time (deptime) submenu
         if self.game.F_choice:
             # Display departure times in 2 columns
@@ -97,7 +112,12 @@ class MainWindow():
         """Save the chosen Service in the player's data"""
         if not self.game.F_choice:
             self.game.logger.dump("[WARNING] trying to submit a deptime outside of the deptime menu (this should not happen)")
-        self.game.player.next_serv = self.game.serv_manager.get_serv_by_id(list(self.dts.keys())[self.arpos])
+        self.game.player.serv = self.game.serv_manager.get_serv_by_id(list(self.dts.keys())[self.arpos])
+        self.game.player.next_at = self.game.player.serv.staph[self.game.player.sta.id][0]
+        self.game.player.next_dt = self.game.player.serv.staph[self.game.player.sta.id][1]
+        next_sta_id = self.game.player.serv.teisya[self.game.player.serv.teisya.index(self.game.player.sta.id) + 1]
+        # self.game.player.next_sta = self.game.sta_manager.get_sta_by_id(next_sta_id)
+        self.game.player.kukan = (self.game.player.sta, self.game.sta_manager.get_sta_by_id(next_sta_id))
         # Reset attributes
         self.neighbors = None
         self.lines = None
@@ -107,7 +127,7 @@ class MainWindow():
         self.game.F_choice = False
         self.game.F_jikoku = False
         self.game.F_stmenu = True
-        self.game.logger.dump(f"Next train: {self.game.player.next_serv.ki.name} [{self.game.player.next_serv.jifun[0]}] > {self.game.player.next_serv.syu.name} [{self.game.player.next_serv.jifun[-1]}], dep. {self.game.player.next_serv.staph[self.game.player.sta.id][1]}")
+        self.game.logger.dump(f"Next train: {self.game.player.serv.ki.name} [{self.game.player.serv.jifun[0]}] > {self.game.player.serv.syu.name} [{self.game.player.serv.jifun[-1]}], arr. {self.game.player.next_at // 100} dep. {self.game.player.next_dt // 100}")
         
 
     
