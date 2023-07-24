@@ -3,6 +3,9 @@ import copy
 
 
 class Player:
+    WALKING_SPEED_KPH = 5
+    WALKING_SPEED_PER_TURN = WALKING_SPEED_KPH / 3600 * 15 * 1000
+
     def __init__(self, game, sta):
         self.game = game
         self.cash = 50000
@@ -14,6 +17,7 @@ class Player:
         self.sta = sta              # Current Station
         self.serv = None            # Current boarding Service
         self.kukan = (None, None)   # Current segment endpoints
+        self.walking_dist = 0       # Remaining walking distance
 
         self.next_serv = None       # Next used Service
         self.next_at = None         # Next arrival time
@@ -21,7 +25,7 @@ class Player:
         self.next_sta = None
 
         # Flags
-        
+        self.F_wlking = False
 
         # Record attributes
         # TODO
@@ -29,7 +33,20 @@ class Player:
     
 
     def update(self):
-        """Update player properties"""
+        """Update player properties on time change"""
+        # Case when the player walks
+        if self.F_wlking:
+            self.walking_dist -= self.WALKING_SPEED_PER_TURN
+            if self.walking_dist <= 0:
+                self.walking_dist = 0
+                self.F_wlking = False
+                # Update current Station
+                self.sta = self.kukan[1]
+                self.kukan = None
+                self.game.F_stmenu = True
+
+    def tick(self):
+        """Update player properties every tick"""
         # Case when the player is already boarding a Service
         if self.game.F_soukou:
             touchaku = self.serv.staph[self.kukan[1].id][0]

@@ -41,7 +41,7 @@ class Clock():
         """Return the current time in hhmmss format"""
         return self.hour * 10000 + self.minute * 100 + self.second
     
-    def update(self):
+    def tick(self):
         """Operations after a pygame tick"""
         self.ticks_since_timechange += 1
         corrected_tick = self.TIME_TICK_ACCEL if self.game.fast_forward else self.TIME_TICK
@@ -64,3 +64,5 @@ class Clock():
                             self.month += 1
                             if self.month >= 12:
                                 self.month = 1
+            # Operations on time update
+            self.game.player.update()

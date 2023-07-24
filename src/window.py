@@ -1,4 +1,5 @@
 import pygame as pg
+import math
 
 
 class MainWindow():
@@ -28,7 +29,7 @@ class MainWindow():
         self.arpos = 0                      # Current arrow position
 
     
-    def update(self):
+    def tick(self):
         """Update the display"""
         # Clear the screen
         self.screen.fill((0, 0, 0))     # TODO bg color as class variable
@@ -42,18 +43,26 @@ class MainWindow():
 
         # Blit the name of the player's position
         # TODO support for case sta is None (ie. serv is not None)
-        if self.game.player.sta is not None and (self.game.F_stmenu or self.game.F_teisya or self.game.F_jikoku):
+        if self.game.player.sta is not None and (self.game.F_stmenu or self.game.F_teisya or self.game.F_jikoku or self.game.F_rrmenu):
             self.screen.blit(self.bigfont.render(f"@ {self.game.player.sta.name}", True, (255, 255, 255)), (10, 70))
-        elif self.game.player.serv is not None and self.game.F_soukou:
+        elif self.game.player.kukan is not None and (self.game.F_soukou or self.game.player.F_wlking):
             self.screen.blit(self.bigfont.render(f"{self.game.player.kukan[0].name} > {self.game.player.kukan[1].name}", True, (255, 255, 255)), (10, 70))
         
         # Blit the Service that will be used
         next_serv = self.game.player.serv
-        if next_serv is not None and (self.game.F_stmenu or self.game.F_jikoku):
+        if next_serv is not None and (self.game.F_stmenu or self.game.F_jikoku or self.game.F_rrmenu):
+            # TODO miss departure when not in stmenu
             self.screen.blit(self.genfont.render(f"{next_serv.ki.name} > {next_serv.syu.name} | arr. {self.game.clock.format(next_serv.staph[self.game.player.sta.id][0])}", True, (255, 255, 255)), (10, 130))
         elif next_serv is not None and self.game.F_teisya:
             self.screen.blit(self.genfont.render(f"{next_serv.ki.name} > {next_serv.syu.name} | dep. {self.game.clock.format(next_serv.staph[self.game.player.sta.id][1])}", True, (255, 255, 255)), (10, 130))
             self.screen.blit(self.genfont.render(f"next {self.game.player.kukan[1].name}", True, (255, 255, 255)), (10, 160))
+
+        # Blit information when walking
+        if self.game.player.F_wlking:
+            if self.game.player.walking_dist >= 1000:
+                self.screen.blit(self.genfont.render(f">> {self.game.player.kukan[1].name} in {math.ceil(self.game.player.walking_dist / 100) / 10 * 1000} km", True, (255, 255, 255)), (10, 130))
+            else:
+                self.screen.blit(self.genfont.render(f">> {self.game.player.kukan[1].name} in {math.ceil(self.game.player.walking_dist / 100) * 100} m", True, (255, 255, 255)), (10, 130))
 
         # Blit general information when boarding a Service
         if self.game.F_soukou:
@@ -65,12 +74,19 @@ class MainWindow():
         # Station menu
         if self.game.F_stmenu:
             self.screen.blit(self.genfont.render(f"j: timetable menu", True, (255, 255, 255)), (350, 10))
+            self.screen.blit(self.genfont.render(f"r: other connections", True, (255, 255, 255)), (350, 40))
         
         # Timetable menu
         if self.game.F_jikoku:
             # Display every neighbor
             # TODO cases of overly large stations (should be ok with the current db)
-            self.neighbors = self.game.sta_manager.get_neighbors(self.game.player.sta.id)
+            neighbors = self.game.sta_manager.get_neighbors(self.game.player.sta.id)
+            self.neighbors = {}
+            # Only include directions not accessible only on foot
+            for dest in neighbors:
+                paths = self.game.path_manager.get_paths(self.game.player.sta.id, dest)
+                if [path.renraku for path in paths] != [1 for _ in paths]:
+                    self.neighbors[dest] = neighbors[dest]
             self.lines = list(self.neighbors.values())
             self.dests = [self.game.sta_manager.get_sta_by_id(sta).name for sta in self.neighbors.keys()]
             # Blit text for every direction available
@@ -87,6 +103,22 @@ class MainWindow():
             self.dests = None
             self.arbot = 0
             self.arpos = 0
+        
+        # Other connections menu
+        if self.game.F_rrmenu:
+            neighbors = self.game.sta_manager.get_neighbors(self.game.player.sta.id)
+            self.neighbors = {}
+            # Only include directions that can be accessed only on foot
+            for dest in neighbors:
+                paths = self.game.path_manager.get_paths(self.game.player.sta.id, dest)
+                if [path.renraku for path in paths] != [0 for _ in paths]:
+                    self.neighbors[dest] = neighbors[dest]
+            self.dests = [self.game.sta_manager.get_sta_by_id(sta).name for sta in self.neighbors.keys()]
+            # Blit text for every direction available
+            for i in range(len(self.neighbors)):
+                self.screen.blit(self.genfont.render(f"{i+1}: {self.dests[i]}", True, (255, 255, 255)), (350, 10 + 30*i))
+            # Blit additional line for exit instructions
+            self.screen.blit(self.genfont.render("r: back to main menu", True, (255, 255, 255)), (350, 10 + 30*len(self.neighbors)))
         
         # Train menu (at a Station)
         if self.game.F_teisya:
@@ -129,7 +161,19 @@ class MainWindow():
         self.game.F_stmenu = True
         self.game.logger.dump(f"Next train: {self.game.player.serv.ki.name} [{self.game.player.serv.jifun[0]}] > {self.game.player.serv.syu.name} [{self.game.player.serv.jifun[-1]}], arr. {self.game.player.next_at // 100} dep. {self.game.player.next_dt // 100}")
         
-
+    def submit_out(self, choice):
+        """Save the chosen outside connection in the player's data"""
+        if not self.game.F_rrmenu:
+            self.game.logger.dump("[WARNING] wrong menu for submitting an outside connection (this should not happen)")
+        self.game.player.kukan = (self.game.player.sta, self.game.sta_manager.get_sta_by_id(list(self.neighbors.keys())[choice]))
+        self.game.player.F_wlking = True
+        # Get walking distance (there should be only one foot-only path)
+        paths = self.game.path_manager.get_paths(self.game.player.sta.id, list(self.neighbors.keys())[choice])
+        self.game.player.walking_dist = int([path.kyori for path in paths if path.renraku == 1][0] * 1000)
+        # Reset attributes
+        self.game.F_rrmenu = False
+        self.game.F_stmenu = False
+        self.game.logger.dump(f"Taking outside connection to {self.game.player.kukan[1].name}, rem. {self.game.player.walking_dist}")
     
     def can_choose(self, tgt):
         """Check if the target choice in the timetable menu does not overflow"""

@@ -32,6 +32,7 @@ class Game:
         # Flags
         self.F_stmenu = True        # Generic menu at a Station. Game always starts at a station
         self.F_jikoku = False       # Timetable menu
+        self.F_rrmenu = False       # Other connections menu
         self.F_choice = False       # Choice in timetable menu
         self.F_shinai = False       # City menu
         self.F_soukou = False       # Train menu (between Stations)
@@ -72,9 +73,9 @@ class Game:
 
     def tick(self):
         """Operations on tick change"""
-        self.clock.update()
-        self.main_window.update()
-        self.player.update()
+        self.clock.tick()
+        self.main_window.tick()
+        self.player.tick()
 
     def run(self):
         """Main loop"""

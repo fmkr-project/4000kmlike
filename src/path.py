@@ -4,7 +4,7 @@ class PathManager():
         self.pathlist = {}
 
         for path in self.game.data.execute("select * from path").fetchall():
-            self.pathlist[path[0]] = Path(path[0], path[1], path[2], path[3], path[4])
+            self.pathlist[path[0]] = Path(path[0], path[1], path[2], path[3], path[4], path[5])
     
 
     def integrity_check(self):
@@ -33,6 +33,18 @@ class PathManager():
             if (path.start == start and path.end == end) or (path.end == start and path.start == end):
                 return True
         return False
+
+    def get_paths(self, start, end):
+        """Return existing paths between specified endpoints"""
+        res = []
+        for path in self.pathlist.values():
+            if (path.start == start and path.end == end) or (path.end == start and path.start == end):
+                res.append(path)
+        return res
+
+    def get_path_by_id(self, path_id):
+        """Return the path of given id"""
+        return self.pathlist[path_id]
     
 
     def build_path(self, route):
@@ -59,11 +71,12 @@ class PathManager():
 
 
 class Path:
-    def __init__(self, id, start, end, name, lg):
+    def __init__(self, id, start, end, name, lg, onfoot):
         self.id = id
         self.start = start
         self.end = end
         self.rosen = name
         self.kyori = lg
+        self.renraku = onfoot
         
         self.used = False

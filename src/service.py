@@ -45,7 +45,7 @@ class ServManager():
             for i in range(len(serv.jifun)-1):
                 if serv.jifun[i] > serv.jifun[i+1]:
                     self.game.logger.dump(f"[WARNING] in service of id {serv.id}: time {serv.jifun[i]} is before time {serv.jifun[i+1]}")
-            
+
             for i in range(1, stopnum-1):
                 if serv.jifun[1 + (i-1)*2] == serv.jifun[i*2]:
                     self.game.logger.dump(f"[WARNING] in service of id {serv.id}: station id {serv.teisya[i]} has stopping time of 0 (@{serv.jifun[i*2]}), will be skipped")
@@ -56,7 +56,7 @@ class ServManager():
                 if (time // 10000 not in range(0,24) or (time % 10000) // 100 not in range(0,60) or time % 100 not in range(0,60)):
                     self.game.logger.dump(f"[WARNING] in service of id {serv.id}: time {time} does not match format [h]hmmss")
 
-        # Path check
+        # Route check
         for serv in self.servlist.values():
             for sta in serv.keiro:
                 if sta not in self.game.sta_manager.stalist_by_id():
@@ -64,7 +64,9 @@ class ServManager():
             for i in range(len(serv.keiro)-1):
                 if not self.game.path_manager.has_path(serv.keiro[i], serv.keiro[i+1]):
                     self.game.logger.dump(f"[WARNING] in service of id {serv.id}: no path between {serv.keiro[i]} and {serv.keiro[i+1]}")
-                # TODO bus etc
+                # Check if the route does not contain foot-only paths
+                if True in [path.renraku for path in self.game.path_manager.get_paths(serv.keiro[i], serv.keiro[i+1])]:
+                    self.game.logger.dump(f"[WARNING] in service of id {serv.id}: the path between {serv.keiro[i]} and {serv.keiro[i+1]} is not usable by a service")
 
         # Service continuity check
         for comp in self.get_comps():
