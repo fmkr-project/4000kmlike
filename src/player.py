@@ -1,4 +1,4 @@
-import copy
+import bag
 
 
 
@@ -7,10 +7,19 @@ class Player:
     WALKING_SPEED_PER_TURN = WALKING_SPEED_KPH / 3600 * 15 * 1000
     MAX_WALKABLE_DISTANCE = 20.          # in km
 
+    HG_PER_TURN = 0.045
+    HG_PER_TURN_WALK = 0.09
+    HP_PER_TURN = 0.0002
+    HP_PER_TURN_ACCEL = 0.03
+
     def __init__(self, game, sta):
         self.game = game
+
+        # Player internals
         self.cash = 50000
-        self.inventory = 9 * [None]
+        self.bag = bag.Bag(self)
+        self.hp = 100
+        self.onaka = 100
 
         # Map attributes
         # TODO save function
@@ -36,7 +45,10 @@ class Player:
     def update(self):
         """Update player properties on time change"""
         # Case when the player walks
+        self.hp -= self.HP_PER_TURN
+        self.onaka -= self.HG_PER_TURN
         if self.F_wlking:
+            self.onaka -= self.HG_PER_TURN_WALK
             self.walking_dist -= self.WALKING_SPEED_PER_TURN
             if self.walking_dist <= 0:
                 self.walking_dist = 0
@@ -45,6 +57,13 @@ class Player:
                 self.sta = self.kukan[1]
                 self.kukan = None
                 self.game.F_stmenu = True
+        
+        # Internals check
+        if self.onaka < 0:
+            self.onaka = 0
+            self.hp -= self.HP_PER_TURN_ACCEL
+        if self.gameover():
+            self.game.gameover()
 
     def tick(self):
         """Update player properties every tick"""
@@ -110,4 +129,4 @@ class Player:
 
     def gameover(self):
         """Check if the player can no longer continue"""
-        return self.cash <= 0
+        return self.cash <= 0 or self.hp <= 0

@@ -1,5 +1,6 @@
 import sqlite3 as sql
 import pygame as pg
+import tkinter.messagebox as messagebox
 
 import station
 import path
@@ -95,6 +96,12 @@ class Game:
         
             self.clock.pgclock.tick(self.TICKS_PER_SECOND)
         
+        self.quit_game()
+    
+    def gameover(self):
+        """Show an alert to the player and end the game"""
+        messagebox.showwarning(title='4000kmlike', message=':(')
+        self.running = False
         self.quit_game()
     
 

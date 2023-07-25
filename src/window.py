@@ -2,6 +2,7 @@ import pygame as pg
 import math
 
 
+
 class MainWindow():
     def __init__(self, game, width, height):
         self.game = game
@@ -34,6 +35,7 @@ class MainWindow():
         # Clear the screen
         self.screen.fill((0, 0, 0))     # TODO bg color as class variable
 
+        ### General purpose blits
         # Blit the day & time
         # TODO delete magic variables !!!
         self.screen.blit(self.genfont.render(f"{self.game.clock.day}", True, (255, 255, 255)), (10, 10))
@@ -42,12 +44,21 @@ class MainWindow():
             self.screen.blit(self.genfont.render('F', True, (255, 255, 255)), (150, 25))
 
         # Blit the name of the player's position
-        # TODO support for case sta is None (ie. serv is not None)
         if self.game.player.sta is not None and (self.game.F_stmenu or self.game.F_teisya or self.game.F_jikoku or self.game.F_rrmenu):
             self.screen.blit(self.bigfont.render(f"@ {self.game.player.sta.name}", True, (255, 255, 255)), (10, 70))
         elif self.game.player.kukan is not None and (self.game.F_soukou or self.game.player.F_wlking):
             self.screen.blit(self.bigfont.render(f"{self.game.player.kukan[0].name} > {self.game.player.kukan[1].name}", True, (255, 255, 255)), (10, 70))
         
+        # Blit player's other attributes
+        self.screen.blit(self.genfont.render(f"{math.ceil(self.game.player.hp)}", True,(255, 255, 255)), (210, 10))
+        self.screen.blit(self.genfont.render(f"{math.ceil(self.game.player.onaka)}", True,(255, 255, 255)), (210, 40))
+
+        # Blit the 9 first items of the player's Bag
+        for i in range(9):
+            if i < len(self.game.player.bag.items) - 1:
+                self.screen.blit(self.genfont.render(f"{i}: {self.game.player.bag.items[i].initial()}", True, (255, 255, 255)), (650, 150 + 30 * i))
+
+        ### Menu-specific blits
         # Blit the Service that will be used
         next_serv = self.game.player.serv
         if next_serv is not None and (self.game.F_stmenu or self.game.F_jikoku or self.game.F_rrmenu):
@@ -143,7 +154,7 @@ class MainWindow():
                     deltas[i] = 9999 if deltas[i] < 0 else deltas[i]
                 self.arpos = deltas.index(min(deltas))
 
-            for i in range(len(self.dts)): # TODO account for current time
+            for i in range(len(self.dts)):
                 # TODO find a way to make tabulations work properly (or use a monospace font)
                 self.screen.blit(self.genfont.render(f"{list(self.dts.values())[i]} > {self.game.serv_manager.get_serv_by_id(list(self.dts.keys())[i]).syu.name}", True, (255, 255, 255)), (30, 250 + 30*i))
             # Display "arrow"

@@ -30,6 +30,7 @@ class Clock():
     
     def format(self, timestamp):
         """Format a timestamp (hhmm or hhmmss format) into hh:mm:ss format"""
+        # TODO #9
         if timestamp in range(0, 9999):
             # hhmm
             return f"{timestamp // 100:02}:{timestamp % 100:02}:00"
