@@ -10,6 +10,7 @@ import clock
 import player
 import window
 import inputs
+import items
 
 
 
@@ -55,6 +56,7 @@ class Game:
             raise FileNotFoundError("Database file could not be found")
 
         self.clock = clock.Clock(self)
+        self.item_manager = items.ItemManager(self)
 
         self.sta_manager = station.StaManager(self)
         self.path_manager = path.PathManager(self)

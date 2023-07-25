@@ -28,6 +28,7 @@ class Player:
         self.serv = None            # Current boarding Service
         self.kukan = (None, None)   # Current segment endpoints
         self.walking_dist = 0       # Remaining walking distance
+        self.wait = 0               # Remaining waiting time
 
         self.next_serv = None       # Next used Service
         self.next_at = None         # Next arrival time
@@ -62,6 +63,8 @@ class Player:
         if self.onaka < 0:
             self.onaka = 0
             self.hp -= self.HP_PER_TURN_ACCEL
+        if self.onaka >= 100:
+            self.onaka = 100
         if self.gameover():
             self.game.gameover()
 
@@ -125,6 +128,16 @@ class Player:
         self.game.F_shinai = False
         self.game.F_soukou = False
         self.game.F_teisya = False
+    
+    def buy(self, shop, choice):
+        """Check if the player can afford the item in the specified shop"""
+        item = list(shop.syouhin.keys())[choice]
+        price = list(shop.syouhin.values())[choice]
+        if self.cash >= price:
+            self.bag.add(item)
+            self.cash -= price
+        else:
+            self.game.logger.dump(f"Not enough money to buy {item.name}")
 
 
     def gameover(self):

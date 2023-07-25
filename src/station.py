@@ -1,3 +1,7 @@
+import shop
+
+
+
 class StaManager:
     def __init__(self, game):
         self.game = game
@@ -5,7 +9,19 @@ class StaManager:
         
         # Initialize station list
         for sta in self.game.data.execute("select * from station").fetchall():
-            self.stalist[sta[0]] = Station(self, sta[0], sta[1], None)
+            new = Station(self, sta[0], sta[1], None)
+            if sta[2] not in ("", None):
+                try:
+                    shops = eval(sta[2])
+                    for shop_id in shops:
+                        shop_data = self.game.data.execute(f"select * from shop_preset where id = {shop_id}").fetchone()
+                        new.shops.append(shop.FixedShop(self.game, (shop_data[2], shop_data[3]), shop_data[1]))
+                    self.game.logger.dump(f"Station {sta[1]} has {len(shops)} shop(s)")
+                except SyntaxError or NameError:
+                    self.game.logger.dump(f"[WARNING] on station id {sta[0]}: expected type int list for station shops, found {sta[2]}")
+            else:
+                self.game.logger.dump(f"Station {sta[1]} has no shops")
+            self.stalist[sta[0]] = new
     
     def stalist_by_id(self):
         """Get the list of station ids"""
@@ -30,6 +46,10 @@ class Station:
         self.mg = mg
         self.mg.game.logger.dump(f"Creating station, {name}, of id {id}")
 
+        # Low-level internals
         self.id = id
         self.name = name
         self.coords = coords
+
+        # Gameplay internals
+        self.shops = []

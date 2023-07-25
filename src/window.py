@@ -24,6 +24,8 @@ class MainWindow():
         self.choice_dir = None              # Current direction choice
         self.choice_serv = None             # Current service choice
 
+        self.shopmenu = None
+
         # "Arrow"
         self.artop = 0                      # Top boundary
         self.arbot = 0                      # Bottom boundary
@@ -41,22 +43,24 @@ class MainWindow():
         self.screen.blit(self.genfont.render(f"{self.game.clock.day}", True, (255, 255, 255)), (10, 10))
         self.screen.blit(self.genfont.render(self.game.clock.format(self.game.clock.get_hms()), True, (255, 255, 255)), (10, 40))
         if self.game.fast_forward:
-            self.screen.blit(self.genfont.render('F', True, (255, 255, 255)), (150, 25))
+            self.screen.blit(self.genfont.render('F', True, (255, 255, 255)), (140, 25))
 
         # Blit the name of the player's position
-        if self.game.player.sta is not None and (self.game.F_stmenu or self.game.F_teisya or self.game.F_jikoku or self.game.F_rrmenu):
+        # TODO function to determine if sta & service data can be displayed
+        if self.game.player.sta is not None and (self.game.F_stmenu or self.game.F_teisya or self.game.F_jikoku or self.game.F_rrmenu or self.shopmenu is not None):
             self.screen.blit(self.bigfont.render(f"@ {self.game.player.sta.name}", True, (255, 255, 255)), (10, 70))
         elif self.game.player.kukan is not None and (self.game.F_soukou or self.game.player.F_wlking):
             self.screen.blit(self.bigfont.render(f"{self.game.player.kukan[0].name} > {self.game.player.kukan[1].name}", True, (255, 255, 255)), (10, 70))
         
         # Blit player's other attributes
-        self.screen.blit(self.genfont.render(f"{math.ceil(self.game.player.hp)}", True,(255, 255, 255)), (210, 10))
-        self.screen.blit(self.genfont.render(f"{math.ceil(self.game.player.onaka)}", True,(255, 255, 255)), (210, 40))
+        self.screen.blit(self.genfont.render(f"{math.ceil(self.game.player.hp)}", True,(255, 255, 255)), (170, 10))
+        self.screen.blit(self.genfont.render(f"{math.ceil(self.game.player.onaka)}", True,(255, 255, 255)), (170, 40))
+        self.screen.blit(self.genfont.render(f"{self.game.player.cash}", True,(255, 255, 255)), (230, 25))
 
         # Blit the 9 first items of the player's Bag
         for i in range(9):
-            if i < len(self.game.player.bag.items) - 1:
-                self.screen.blit(self.genfont.render(f"{i}: {self.game.player.bag.items[i].initial()}", True, (255, 255, 255)), (650, 150 + 30 * i))
+            if i < len(self.game.player.bag.items):
+                self.screen.blit(self.genfont.render(f"{i}: {list(self.game.player.bag.items.keys())[i].initial()}", True, (255, 255, 255)), (680, 10 + 30 * i))
 
         ### Menu-specific blits
         # Blit the Service that will be used
@@ -86,7 +90,20 @@ class MainWindow():
         if self.game.F_stmenu:
             self.screen.blit(self.genfont.render(f"j: timetable menu", True, (255, 255, 255)), (350, 10))
             self.screen.blit(self.genfont.render(f"r: other connections", True, (255, 255, 255)), (350, 40))
+            # Display station shops
+            if self.game.player.sta.shops != []:
+                for i in range(len(self.game.player.sta.shops)):
+                    self.screen.blit(self.genfont.render(f"{i+1}: {self.game.player.sta.shops[i].name}", True, (255, 255, 255)), (350, 70 + 30*i))
         
+        # Shop menu
+        if self.shopmenu is not None:
+            shop = self.game.player.sta.shops[self.shopmenu]
+            # Display sold items
+            for i in range(len(shop.syouhin)):
+                self.screen.blit(self.genfont.render(f"{i+1}: {list(shop.syouhin.keys())[i].name} | {list(shop.syouhin.values())[i]}", True, (255, 255, 255)), (350, 10 + 30*i))
+            # Blit additional line for exit instructions
+            self.screen.blit(self.genfont.render("x: back to station menu", True, (255, 255, 255)), (350, 10 + 30*len(shop.syouhin)))
+
         # Timetable menu
         if self.game.F_jikoku:
             # Display every neighbor
@@ -207,7 +224,33 @@ class MainWindow():
         self.game.player.next_at = None
         self.game.player.next_dt = None
         self.game.player.serv = None
+
+    
+    def submit_shop(self, choice):
+        """Get to the corresponding shop menu"""
+        if not self.game.F_stmenu:
+            self.game.logger.dump("[WARNING] wrong menu for entering a shop (this should not happen)")
+        self.game.F_stmenu = False
+        self.shopmenu = choice
+    
+    def submit_buy(self, choice):
+        """Buy the chosen item if the player has enough money"""
+        if self.shopmenu is None:
+            self.game.logger.dump("[WARNING] wrong menu for buying an item (this should not happen)")
+        self.game.F_stmenu = True
+        self.game.player.buy(self.game.player.sta.shops[self.shopmenu], choice)
+        self.shopmenu = None
     
     def can_choose(self, tgt):
         """Check if the target choice in the timetable menu does not overflow"""
-        return tgt in range(1, len(self.neighbors) + 1)
+        if self.game.F_jikoku or self.game.F_rrmenu:
+            return tgt in range(1, len(self.neighbors) + 1)
+        if self.game.F_stmenu:
+            return tgt in range(1, len(self.game.player.sta.shops) + 1)
+        if self.shopmenu is not None:
+            return tgt in range(1, len(self.game.player.sta.shops[self.shopmenu].syouhin) + 1)
+    
+    def close_shopmenu(self):
+        """Leave shop and go back to station menu"""
+        self.game.F_stmenu = True
+        self.shopmenu = None
