@@ -12,6 +12,8 @@ import window
 import inputs
 import items
 
+import checks.farecheck
+
 
 
 class Game:
@@ -44,6 +46,8 @@ class Game:
         self.fast_forward = False
 
         # Lower level internals
+
+
         self.logger.dump("Connecting to database")
         try:
             self.data = sql.connect(self.RESDB_LOCATION).cursor()

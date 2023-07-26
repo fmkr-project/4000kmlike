@@ -1,5 +1,6 @@
 import bag
 import items
+import ticket
 
 
 
@@ -21,6 +22,9 @@ class Player:
         self.bag = bag.Bag(self)
         self.hp = 100
         self.onaka = 100
+        # TODO shuyuken
+        self.kippu = None
+        self.shuyu = []
 
         # Map attributes
         # TODO save function
@@ -72,6 +76,7 @@ class Player:
     def tick(self):
         """Update player properties every tick"""
         # Case when the player is already boarding a Service
+        # At this point, the player already owns a ticket
         if self.game.F_soukou:
             touchaku = self.serv.staph[self.kukan[1].id][0]
             # Arrival at a Station
@@ -91,8 +96,15 @@ class Player:
             if self.game.clock.get_hms() >= hassya:
                 self.game.F_teisya = False
                 self.game.F_soukou = True
+                # Case when the player reuses a Station that is already in the Ticket's route (U-turn, etc.)
+                # This should not happen when already inside a Service
+                # TODO cases when a station appears twice
+                if self.kukan[1] in self.kippu.keiro:
+                    self.end_ticket()
+                    self.create_ticket()
+                self.kippu.incr(self.kukan)
         else:
-            # Arrival of a Service
+            # Arrival of a Service when the player waits at a Station
             if self.next_at is not None and self.game.clock.get_hms() >= self.next_at and self.game.clock.get_hms() <= self.next_dt:
                 # Update Player properties
                 # TODO manage termini
@@ -106,7 +118,7 @@ class Player:
                 # TODO case F_shinai
                 self.game.F_teisya = True
             
-            # Departure of a Service
+            # Departure of a Service when the player first boards it
             if self.next_dt is not None and self.game.clock.get_hms() >= self.next_dt and self.next_at is None:
                 # Update Player properties
                 self.next_dt = None
@@ -129,6 +141,19 @@ class Player:
         self.game.F_shinai = False
         self.game.F_soukou = False
         self.game.F_teisya = False
+
+
+    def create_ticket(self):
+        """Initialize a new Ticket"""
+        self.kippu = ticket.StandardTicket(self, self.sta)
+
+
+    def end_ticket(self):
+        """Finish using the current Ticket"""
+        # TODO collection
+        self.cash -= self.kippu.unchin
+        self.kippu = None
+
     
     def buy(self, shop, choice):
         """Check if the player can afford the item in the specified shop"""
@@ -144,6 +169,7 @@ class Player:
             self.game.logger.dump(f"Not enough money to buy {item.name}")
     
     def restore_hunger(self, item):
+        """Eat a Consumable2 item"""
         old = self.onaka
         self.onaka += item.kaifuku
         if self.onaka >= 100:

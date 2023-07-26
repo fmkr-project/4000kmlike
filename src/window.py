@@ -62,6 +62,12 @@ class MainWindow():
             if i < len(self.game.player.bag.items):
                 self.screen.blit(self.genfont.render(f"{i}: {list(self.game.player.bag.items.keys())[i].initial()}", True, (255, 255, 255)), (680, 10 + 30 * i))
 
+        # Blit current ticket information
+        ticket = self.game.player.kippu
+        if ticket is not None and len(ticket.keiro) > 1:
+            self.screen.blit(self.bigfont.render(f"{ticket.keiro[0].name} > {ticket.keiro[-1].name} ({ticket.unchin})", True, (255, 255, 255)), (10, 620))
+            self.screen.blit(self.genfont.render(f"{ticket.route_tostring()}", True, (255, 255, 255)), (10, 670))
+
         ### Menu-specific blits
         # Blit the Service that will be used
         next_serv = self.game.player.serv
@@ -192,6 +198,9 @@ class MainWindow():
         next_sta_id = self.game.player.serv.teisya[self.game.player.serv.teisya.index(self.game.player.sta.id) + 1]
         # self.game.player.next_sta = self.game.sta_manager.get_sta_by_id(next_sta_id)
         self.game.player.kukan = (self.game.player.sta, self.game.sta_manager.get_sta_by_id(next_sta_id))
+        # Create ticket information if the player doesn't have one
+        if self.game.player.kippu is None:
+            self.game.player.create_ticket()
         # Reset attributes
         self.neighbors = None
         self.lines = None
