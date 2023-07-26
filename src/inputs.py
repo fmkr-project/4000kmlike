@@ -22,7 +22,7 @@ def handle_key_down(game, event):
         return
     
     # Other connections - Menu
-    if event.key == pg.K_r:
+    if event.key == pg.K_g:
         if game.F_stmenu:
             game.F_stmenu = False
             game.F_rrmenu = True

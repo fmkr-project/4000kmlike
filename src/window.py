@@ -89,7 +89,7 @@ class MainWindow():
         # Station menu
         if self.game.F_stmenu:
             self.screen.blit(self.genfont.render(f"j: timetable menu", True, (255, 255, 255)), (350, 10))
-            self.screen.blit(self.genfont.render(f"r: other connections", True, (255, 255, 255)), (350, 40))
+            self.screen.blit(self.genfont.render(f"g: other connections", True, (255, 255, 255)), (350, 40))
             # Display station shops
             if self.game.player.sta.shops != []:
                 for i in range(len(self.game.player.sta.shops)):
@@ -151,7 +151,7 @@ class MainWindow():
             for i in range(len(self.neighbors)):
                 self.screen.blit(self.genfont.render(f"{i+1}: {self.dests[i]}", True, (255, 255, 255)), (350, 10 + 30*i))
             # Blit additional line for exit instructions
-            self.screen.blit(self.genfont.render("r: back to main menu", True, (255, 255, 255)), (350, 10 + 30*len(self.neighbors)))
+            self.screen.blit(self.genfont.render("g: back to main menu", True, (255, 255, 255)), (350, 10 + 30*len(self.neighbors)))
         
         # Train menu (at a Station)
         if self.game.F_teisya:
