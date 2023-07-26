@@ -9,6 +9,8 @@ class ItemManager():
                 self.itemlist[item[0]] = Consumable2(item[0], item[1], item[2], item[3])
             elif item[2] == "consumable1":
                 self.itemlist[item[0]] = Consumable1(item[0], item[1], item[2], item[3])
+            elif item[2] == "instant":
+                self.itemlist[item[0]] = Instant(item[0], item[1], item[2], item[3])
             else:
                 self.itemlist[item[0]] = Item(item[0], item[1], item[2])
 
@@ -19,7 +21,11 @@ class ItemManager():
 
     def use_item(self, item):
         # TODO filter by item type
-        pass
+        if type(item) in (Instant, Consumable2):
+            self.game.player.restore_hunger(item)
+        elif type(item) is Consumable1:
+            pass # TODO hp
+            
 
 
 class Item():
@@ -32,6 +38,12 @@ class Item():
     def initial(self):
         return self.name[0] if self.name is not None else ""
 
+
+class Instant(Item):
+    """Items that cannot be stored in the player's inventory"""
+    def __init__(self, id, name, type, val):
+        super().__init__(id, name, type)
+        self.kaifuku = val
 
 class Consumable2(Item):
     """Items that restore hunger"""

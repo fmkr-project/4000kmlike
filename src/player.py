@@ -1,4 +1,5 @@
 import bag
+import items
 
 
 
@@ -134,10 +135,20 @@ class Player:
         item = list(shop.syouhin.keys())[choice]
         price = list(shop.syouhin.values())[choice]
         if self.cash >= price:
-            self.bag.add(item)
+            if type(item) is items.Instant:
+                self.game.item_manager.use_item(item)
+            else:
+                self.bag.add(item)
             self.cash -= price
         else:
             self.game.logger.dump(f"Not enough money to buy {item.name}")
+    
+    def restore_hunger(self, item):
+        old = self.onaka
+        self.onaka += item.kaifuku
+        if self.onaka >= 100:
+            self.onaka = 100
+        self.game.logger.dump(f"Restored {item.kaifuku} hunger (from {old} to {self.onaka})")
 
 
     def gameover(self):
