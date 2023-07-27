@@ -1,3 +1,7 @@
+import fare
+
+
+
 class Ticket():
     def __init__(self, player):
         self.player = player
@@ -23,14 +27,17 @@ class StandardTicket(Ticket):
         path = self.player.game.path_manager.get_paths(sec[0].id, sec[1].id)[0]       # Assume shortest route
         self.kyori += path.kyori
         self.keiro.append(sec[1])
-        self.unchin = self.search_fare()
-        self.calculate_deadline()
         # TODO manage tarification systems correctly
         self.ftype = "chihou"
+        self.search_fare()
+        self.calculate_deadline()
 
     def search_fare(self):
         """Search the current fare depending on the current tarification system"""
-        return 600 # TODO
+        try:
+            self.unchin = fare.search_fare(self.kyori, self.ftype)
+        except:
+            self.unchin = fare.search_fare(self.kyori, "chihou")
 
     def route_tostring(self):
         """Return a string representation of the current route"""
