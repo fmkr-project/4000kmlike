@@ -48,7 +48,8 @@ class StandardTicket(Ticket):
 
     def calculate_deadline(self):
         """Calculate remaining days before ticket expiration"""
-        return 1 # TODO
+        # Same for every line
+        return self.kyori // 200 + 1
 
 
 class WideTicket(Ticket):

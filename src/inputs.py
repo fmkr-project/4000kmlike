@@ -9,6 +9,7 @@ Manage key inputs
 def handle_key_down(game, event):
     """Trigger action based on key press"""
     numerics = (pg.K_1, pg.K_2, pg.K_3, pg.K_4, pg.K_5, pg.K_6, pg.K_7, pg.K_8, pg.K_9, pg.K_0)
+    itemkeys = (pg.K_a, pg.K_z, pg.K_e, pg.K_r, pg.K_t, pg.K_y, pg.K_u, pg.K_i, pg.K_o, pg.K_p)
 
     # Exit event
     if event.key == pg.K_ESCAPE:
@@ -20,6 +21,10 @@ def handle_key_down(game, event):
         game.fast_forward = not game.fast_forward
         game.logger.dump("Fast-forwarding") if game.fast_forward else game.logger.dump("Returning to normal speed")
         return
+
+    # Item usage
+    if event.key in itemkeys and not game.F_choice:
+        game.player.use_item(itemkeys.index(event.key))
     
     # Other connections - Menu
     if event.key == pg.K_g:

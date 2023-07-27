@@ -26,6 +26,9 @@ class MainWindow():
 
         self.shopmenu = None
 
+        # TODO qwerty
+        self.item_keys = "azertyuiop"
+
         # "Arrow"
         self.artop = 0                      # Top boundary
         self.arbot = 0                      # Bottom boundary
@@ -60,7 +63,7 @@ class MainWindow():
         # Blit the 9 first items of the player's Bag
         for i in range(9):
             if i < len(self.game.player.bag.items):
-                self.screen.blit(self.genfont.render(f"{i}: {list(self.game.player.bag.items.keys())[i].initial()}", True, (255, 255, 255)), (680, 10 + 30 * i))
+                self.screen.blit(self.genfont.render(f"{self.item_keys[i]}: {self.game.player.bag.items[i].initial()}", True, (255, 255, 255)), (680, 10 + 30 * i))
 
         # Blit current ticket information
         ticket = self.game.player.kippu

@@ -167,9 +167,16 @@ class Player:
             self.cash -= price
         else:
             self.game.logger.dump(f"Not enough money to buy {item.name}")
-    
+        
+    def use_item(self, item_pos):
+        """Take an item from the Bag and use it"""
+        if item_pos < len(self.bag.items):
+            item = self.bag.items[item_pos]
+            self.bag.remove(item)
+            self.game.item_manager.use_item(item)
+        
     def restore_hunger(self, item):
-        """Eat a Consumable2 item"""
+        """Apply the effects of a Consumable2 item"""
         old = self.onaka
         self.onaka += item.kaifuku
         if self.onaka >= 100:

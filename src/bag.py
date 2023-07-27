@@ -1,16 +1,15 @@
 class Bag():
     def __init__(self, player):
         self.player = player
-        self.items = {}
+        self.items = []
     
-    def add(self, item, qty = 1):
-        if item not in self.items:
-            self.items[item] = qty
-        else:
-            self.items[item] += qty
+
+    def add(self, item):
+        self.items.append(item)
+        
 
     def remove(self, item):
         if item in self.items:
-            self.items[item] -= 1
+            del(self.items[self.items.index(item)])
         else:
             return

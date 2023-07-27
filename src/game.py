@@ -119,6 +119,7 @@ class Game:
             self.data.close()
         except sql.ProgrammingError:
             self.logger.dump("[WARNING] Database is currently not accessible")
+        self.running = False
         pg.display.quit()
         pg.quit()
         self.logger.dump("Game exit complete.")
