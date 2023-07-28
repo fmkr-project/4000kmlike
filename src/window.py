@@ -118,12 +118,14 @@ class MainWindow():
             # Display every neighbor
             # TODO cases of overly large stations (should be ok with the current db)
             neighbors = self.game.sta_manager.get_neighbors(self.game.player.sta.id)
-            self.neighbors = {}
+            self.neighbors = {}             # Store a dict of structure {destination: line name}
+            self.paths = []                 # Store a list of associated paths
             # Only include directions not accessible only on foot
             for dest in neighbors:
                 paths = self.game.path_manager.get_paths(self.game.player.sta.id, dest)
                 if [path.renraku for path in paths] != [1 for _ in paths]:
                     self.neighbors[dest] = neighbors[dest]
+                    self.paths.append([path for path in paths if path.renraku == 0][0])
             self.lines = list(self.neighbors.values())
             self.dests = [self.game.sta_manager.get_sta_by_id(sta).name for sta in self.neighbors.keys()]
             # Blit text for every direction available
@@ -135,7 +137,9 @@ class MainWindow():
             else:
                 self.screen.blit(self.genfont.render("j: back to main menu", True, (255, 255, 255)), (350, 10 + 30*len(self.neighbors)))
         else:
+            # Set attributes to default (null) values
             self.neighbors = None
+            self.paths = None
             self.lines = None
             self.dests = None
             self.arbot = 0
@@ -149,6 +153,7 @@ class MainWindow():
             for dest in neighbors:
                 paths = self.game.path_manager.get_paths(self.game.player.sta.id, dest)
                 # Find shortest path
+                # TODO might cause problems on station couples with more than one usable path
                 shortest = paths[0]
                 for path in paths:
                     if path.kyori < shortest.kyori:
@@ -195,6 +200,7 @@ class MainWindow():
         """Save the chosen Service in the player's data"""
         if not self.game.F_choice:
             self.game.logger.dump("[WARNING] trying to submit a deptime outside of the deptime menu (this should not happen)")
+        self.game.player.path = self.paths[self.choice_dir]
         self.game.player.serv = self.game.serv_manager.get_serv_by_id(list(self.dts.keys())[self.arpos])
         self.game.player.next_at = self.game.player.serv.staph[self.game.player.sta.id][0]
         self.game.player.next_dt = self.game.player.serv.staph[self.game.player.sta.id][1]
@@ -204,8 +210,10 @@ class MainWindow():
         # Create ticket information if the player doesn't have one
         if self.game.player.kippu is None:
             self.game.player.create_ticket()
+
         # Reset attributes
         self.neighbors = None
+        self.paths = None
         self.lines = None
         self.dests = None
         self.arbot = 0

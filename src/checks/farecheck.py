@@ -13,6 +13,10 @@ for filepath in os.listdir('res/fare/'):
             for i in range(len([0 for _ in f])-1):
                 line = file.readline().strip()
                 line = line.split(';')
+                if line == ['']:
+                    # Buffer lines
+                    continue
+
                 if int(line[0]) != last + 1 and i != 0:
                     raise ValueError(f"in file {filepath}: expected {last+1} but found {int(file.readline().split(';')[0])}")
                 last = int(line[1])

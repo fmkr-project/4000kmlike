@@ -4,7 +4,7 @@ class PathManager():
         self.pathlist = {}
 
         for path in self.game.data.execute("select * from path").fetchall():
-            self.pathlist[path[0]] = Path(path[0], path[1], path[2], path[3], path[4], path[5])
+            self.pathlist[path[0]] = Path(path[0], path[1], path[2], path[3], path[4], path[5], path[6])
     
 
     def integrity_check(self):
@@ -71,12 +71,13 @@ class PathManager():
 
 
 class Path:
-    def __init__(self, id, start, end, name, lg, onfoot):
+    def __init__(self, id, start, end, name, lg, onfoot, tarification):
         self.id = id
         self.start = start
         self.end = end
         self.rosen = name
         self.kyori = lg
         self.renraku = onfoot
+        self.ftype = tarification
         
         self.used = False

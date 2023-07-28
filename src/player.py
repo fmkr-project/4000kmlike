@@ -32,6 +32,7 @@ class Player:
         self.sta = sta              # Current Station
         self.serv = None            # Current boarding Service
         self.kukan = (None, None)   # Current segment endpoints
+        self.path = None            # Current path
         self.walking_dist = 0       # Remaining walking distance
         self.wait = 0               # Remaining waiting time
 
@@ -87,6 +88,7 @@ class Player:
                 if self.kukan is None:
                     self.alight()
                     return
+                self.path = self.serv.get_path_from_section(self.kukan[0], self.kukan[1])
                 # Update game flags
                 self.game.F_teisya = True
                 self.game.F_soukou = False
@@ -96,18 +98,11 @@ class Player:
             if self.game.clock.get_hms() >= hassya:
                 self.game.F_teisya = False
                 self.game.F_soukou = True
-                # Case when the player reuses a Station that is already in the Ticket's route (U-turn, etc.)
-                # This should not happen when already inside a Service
-                # TODO cases when a station appears twice
-                if self.kukan[1] in self.kippu.keiro:
-                    self.end_ticket()
-                    self.create_ticket()
-                self.kippu.incr(self.kukan)
+                self.update_tickets()
         else:
             # Arrival of a Service when the player waits at a Station
             if self.next_at is not None and self.game.clock.get_hms() >= self.next_at and self.game.clock.get_hms() <= self.next_dt:
                 # Update Player properties
-                # TODO manage termini
                 # TODO load new times
                 self.next_at = None
 
@@ -126,6 +121,16 @@ class Player:
                 # Update game flags
                 self.game.F_soukou = True
                 self.game.F_teisya = False
+    
+    def update_tickets(self):
+        """Update current Ticket information on path change"""
+        # Generate new Ticket if route endpoint is already in the ticket's path or tarification system changes.
+        # TODO cases when a station appears twice in a route
+        if self.kukan[1] in self.kippu.keiro or self.kippu.ftype != self.path.ftype:
+            self.end_ticket()
+            self.create_ticket()
+        self.kippu.incr(self.path)
+
 
     def alight(self):
         """Leave Service and go to current station"""

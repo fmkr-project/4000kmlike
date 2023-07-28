@@ -8,6 +8,9 @@ def search_fare(dist, ftype):
             for _ in range(len([0 for _ in filecp])):
                 line = file.readline().strip()
                 line = line.split(';')
+                if line == ['']:
+                    # Buffer lines
+                    continue
                 if math.ceil(dist) in range(int(line[0]), int(line[1]) + 1):
                     return int(line[2])
             return None

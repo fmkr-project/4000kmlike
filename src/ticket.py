@@ -21,14 +21,15 @@ class StandardTicket(Ticket):
     def __init__(self, player, origin):
         super().__init__(player)
         self.keiro.append(origin)
+        self.ftype = player.path.ftype
     
-    def incr(self, sec):
-        """Modify ticket status depending on the current section"""
-        path = self.player.game.path_manager.get_paths(sec[0].id, sec[1].id)[0]       # Assume shortest route
+    def incr(self, path):
+        """Modify ticket status depending on the current used path"""
         self.kyori += path.kyori
+        endpoints = (self.player.game.sta_manager.get_sta_by_id(path.start), self.player.game.sta_manager.get_sta_by_id(path.end))
+        sec = (endpoints[0], endpoints[1]) if endpoints[0] == self.player.sta else (endpoints[1], endpoints[0])
         self.keiro.append(sec[1])
-        # TODO manage tarification systems correctly
-        self.ftype = "chihou"
+        # Assume same tarification system (check beforehand)
         self.search_fare()
         self.calculate_deadline()
 

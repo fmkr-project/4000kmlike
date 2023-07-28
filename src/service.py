@@ -143,6 +143,14 @@ class Service():
             if self.teisya[i] == sta.id:
                 return (self.mg.game.sta_manager.get_sta_by_id(self.teisya[i]), self.mg.game.sta_manager.get_sta_by_id(self.teisya[i+1]))
         return None
+
+    def get_path_from_section(self, start, end):
+        """Return the path of this Service between the specified endpoints"""
+        for path in self.path:
+            endpoints = (self.mg.game.sta_manager.get_sta_by_id(path.start), self.mg.game.sta_manager.get_sta_by_id(path.end))
+            if (endpoints[0] == start and endpoints[1] == end) or (endpoints[1] == start and endpoints[0] == end):
+                return path
+        return None
         
     
     def _merge(self, serv2):
