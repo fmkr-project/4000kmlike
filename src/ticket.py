@@ -11,7 +11,7 @@ class Ticket():
         self.ftype = None       # Current tarification system
         self.kyori = 0          # Current distance traveled
         self.keiro = []         # Current route
-        self.seigen = None      # Time limit, no limit should be None
+        self.seigen = None      # Time limit, no limit (permanent pass) should be None
 
         # TODO collection (in Player)
     
@@ -38,6 +38,7 @@ class StandardTicket(Ticket):
         try:
             self.unchin = fare.search_fare(self.kyori, self.ftype)
         except:
+            # TODO this should not happen in production
             self.unchin = fare.search_fare(self.kyori, "chihou")
 
     def route_tostring(self):

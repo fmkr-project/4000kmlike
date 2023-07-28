@@ -126,9 +126,22 @@ class Player:
         """Update current Ticket information on path change"""
         # Generate new Ticket if route endpoint is already in the ticket's path or tarification system changes.
         # TODO cases when a station appears twice in a route
-        if self.kukan[1] in self.kippu.keiro or self.kippu.ftype != self.path.ftype:
+        if self.kukan[1] in self.kippu.keiro:
             self.end_ticket()
             self.create_ticket()
+        elif self.kippu.ftype != self.path.ftype:
+            # Manage compatible tarification changes
+            ftypes = {self.kippu.ftype, self.path.ftype}
+            tochange = None
+            for conv in self.game.data.execute("select * from cpt_tarifications;").fetchall():
+                print(conv)
+                if eval(conv[0]) == ftypes:
+                    tochange = conv[1]
+            if tochange is not None:
+                self.kippu.ftype = tochange
+            else:
+                self.end_ticket()
+                self.create_ticket()
         self.kippu.incr(self.path)
 
 
@@ -150,6 +163,7 @@ class Player:
 
     def create_ticket(self):
         """Initialize a new Ticket"""
+        # TODO simplify this
         self.kippu = ticket.StandardTicket(self, self.sta)
 
 

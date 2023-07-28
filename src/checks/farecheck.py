@@ -2,10 +2,7 @@ import os
 
 
 
-"""
-Check the correctness of the fare files structure
-"""
-
+# Check the correctness of the fare files structure
 for filepath in os.listdir('res/fare/'):
     with open(f"res/fare/{filepath}", 'r') as file:
         last = -1
