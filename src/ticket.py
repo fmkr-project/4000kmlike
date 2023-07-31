@@ -7,10 +7,7 @@ class Ticket():
         self.player = player
 
         # Internals
-        self.unchin = 0         # Current fare
-        self.ftype = None       # Current tarification system
         self.kyori = 0          # Current distance traveled
-        self.keiro = []         # Current route
         self.seigen = None      # Time limit, no limit (permanent pass) should be None
 
         # TODO collection (in Player)
@@ -20,8 +17,12 @@ class Ticket():
 class StandardTicket(Ticket):
     def __init__(self, player, origin):
         super().__init__(player)
+        self.unchin = 0                     # Current fare
+        self.keiro = []                     # Current route
+        self.ftype = None                   # Current tarification system
         self.keiro.append(origin)
-        self.ftype = player.path.ftype
+        self.ftype = player.path.ftype      # Current tarification system
+        self.sub = None                     # Secondary ticket (Express, etc.)
     
     def incr(self, path):
         """Modify ticket status depending on the current used path"""
@@ -31,6 +32,8 @@ class StandardTicket(Ticket):
         self.keiro.append(sec[1])
         # Assume same tarification system (check beforehand)
         self.search_fare()
+        if self.sub is not None:
+            self.sub.search_fare()
         self.calculate_deadline()
 
     def search_fare(self):
@@ -52,6 +55,18 @@ class StandardTicket(Ticket):
         """Calculate remaining days before ticket expiration"""
         # Same for every line
         return self.kyori // 200 + 1
+
+
+class SubTicket(Ticket):
+    def __init__(self, player, ftype):
+        super().__init__(player)
+        self.unchin = 0                     # Current fare
+        self.ftype = ftype                  # Should be const
+    
+    def search_fare(self):
+        """Search the current fare depending on the current tarification system"""
+        # Should not fail.
+        self.unchin = fare.search_fare(self.kyori, self.ftype)
 
 
 class WideTicket(Ticket):

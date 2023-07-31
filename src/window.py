@@ -68,7 +68,11 @@ class MainWindow():
         # Blit current ticket information
         ticket = self.game.player.kippu
         if ticket is not None and len(ticket.keiro) > 1:
-            self.screen.blit(self.bigfont.render(f"{ticket.keiro[0].name} > {ticket.keiro[-1].name} ({ticket.unchin})", True, (255, 255, 255)), (10, 620))
+            if ticket.sub is None:
+                ticket_info = f"{ticket.keiro[0].name} > {ticket.keiro[-1].name} ({ticket.unchin})"
+            else:
+                ticket_info = f"{ticket.keiro[0].name} > {ticket.keiro[-1].name} ({ticket.unchin}) + ({ticket.sub.unchin})"
+            self.screen.blit(self.bigfont.render(ticket_info, True, (255, 255, 255)), (10, 620))
             self.screen.blit(self.genfont.render(f"{ticket.route_tostring()}", True, (255, 255, 255)), (10, 670))
 
         ### Menu-specific blits

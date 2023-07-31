@@ -134,7 +134,6 @@ class Player:
             ftypes = {self.kippu.ftype, self.path.ftype}
             tochange = None
             for conv in self.game.data.execute("select * from cpt_tarifications;").fetchall():
-                print(conv)
                 if eval(conv[0]) == ftypes:
                     tochange = conv[1]
             if tochange is not None:
@@ -165,12 +164,19 @@ class Player:
         """Initialize a new Ticket"""
         # TODO simplify this
         self.kippu = ticket.StandardTicket(self, self.sta)
+        if self.serv.yuuryou is not None:
+            self.kippu.sub = ticket.SubTicket(self, self.serv.yuuryou)
 
 
     def end_ticket(self):
         """Finish using the current Ticket"""
         # TODO collection
+        # Subtract the ticket(s) current fare from the player's money
         self.cash -= self.kippu.unchin
+        if self.kippu.sub is not None:
+            self.cash -= self.kippu.sub.unchin
+        # Destroy the ticket
+        # TODO there has to be a "cleaner" way
         self.kippu = None
 
     

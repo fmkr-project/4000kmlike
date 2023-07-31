@@ -12,7 +12,7 @@ class ServManager():
             if serv[6] in (None, "") and serv[7] in (None, "") and serv[8] in (None, ""):
                 self.game.logger.dump(f"[INFO] skipping service {serv[0]} as it has no data (buffer line)")
                 continue
-            new = Service(self, serv[0], serv[2], serv[3], serv[4],serv[5], serv[6], serv[7], serv[8], serv[9])
+            new = Service(self, serv[0], serv[2], serv[3], serv[4],serv[5], serv[6], serv[7], serv[8], serv[9], serv[10])
             self.servlist[serv[0]] = new
 
     def get_comps(self):
@@ -90,7 +90,7 @@ class ServManager():
 
 
 class Service():
-    def __init__(self, mg, id, type, nb, comp, name, path, stops, times, link):
+    def __init__(self, mg, id, type, nb, comp, name, path, stops, times, link, supp_fare):
         self.mg = mg
         self.mg.game.logger.dump(f"Creating service of id {id}")
 
@@ -116,6 +116,7 @@ class Service():
         except:
             self.mg.game.logger.dump(f"[ERROR] in times: expected type list, found {times}")
         self.renketu = link
+        self.yuuryou = supp_fare if supp_fare != "" else None
 
         # Calculated attributes
         self.path = self.mg.game.path_manager.build_path(self.keiro)
