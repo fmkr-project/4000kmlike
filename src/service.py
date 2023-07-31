@@ -90,15 +90,16 @@ class ServManager():
 
 
 class Service():
-    def __init__(self, mg, id, type, nb, comp, name, path, stops, times, link, supp_fare):
+    def __init__(self, mg, id, stype, nb, comp, name, path, stops, times, link, supp_fare):
         self.mg = mg
         self.mg.game.logger.dump(f"Creating service of id {id}")
 
         self.id = id
-        self.syubetu = type
-        self.bangou = nb
-        self.unyou = comp
-        self.meisyo = name
+        self.syubetu = stype if stype != "" else None
+        self.bangou = nb if nb != "" else None
+        self.unyou = comp if comp != "" else None
+        self.meisyo = name if name != "" else None
+        
         try:
             self.keiro = eval(path)
         except:
@@ -134,6 +135,15 @@ class Service():
                 self.staph[self.teisya[-1]] = (self.jifun[-1], -1)
             else:
                 self.staph[self.teisya[tei]] = (self.jifun[1+(tei-1)*2], self.jifun[2*tei])
+        
+        # String representation (for display purposes)
+        # TODO should not be None
+        self.name_tostring = self.syubetu if self.syubetu is not None else "local"
+        if self.name_tostring != "local":           # TODO placeholder
+            self.name_tostring += f" <{self.meisyo}" if self.meisyo is not None else ""
+            self.name_tostring += f" {self.bangou}>" if self.bangou is not None else ">" if self.meisyo is not None else ""
+        self.name_tostring += f" for {self.mg.game.sta_manager.get_sta_by_id(self.keiro[-1]).name}"
+
     
     def get_next_section(self, sta):
         """Get section starting with specified station"""

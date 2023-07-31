@@ -78,12 +78,14 @@ class MainWindow():
         ### Menu-specific blits
         # Blit the Service that will be used
         next_serv = self.game.player.serv
-        if next_serv is not None and (self.game.F_stmenu or self.game.F_jikoku or self.game.F_rrmenu):
-            # TODO miss departure when not in stmenu
-            self.screen.blit(self.genfont.render(f"{next_serv.ki.name} > {next_serv.syu.name} | arr. {self.game.clock.format(next_serv.staph[self.game.player.sta.id][0])}", True, (255, 255, 255)), (10, 130))
-        elif next_serv is not None and self.game.F_teisya:
-            self.screen.blit(self.genfont.render(f"{next_serv.ki.name} > {next_serv.syu.name} | dep. {self.game.clock.format(next_serv.staph[self.game.player.sta.id][1])}", True, (255, 255, 255)), (10, 130))
-            self.screen.blit(self.genfont.render(f"next {self.game.player.kukan[1].name}", True, (255, 255, 255)), (10, 160))
+        if next_serv is not None:
+            self.screen.blit(self.genfont.render(f"{next_serv.name_tostring}", True, (255, 255, 255)), (10, 130))
+            if (self.game.F_stmenu or self.game.F_jikoku or self.game.F_rrmenu):
+                # TODO miss departure when not in stmenu
+                self.screen.blit(self.genfont.render(f"{next_serv.ki.name} > {next_serv.syu.name} | arr. {self.game.clock.format(next_serv.staph[self.game.player.sta.id][0])}", True, (255, 255, 255)), (10, 160))
+            elif self.game.F_teisya:
+                self.screen.blit(self.genfont.render(f"{next_serv.ki.name} > {next_serv.syu.name} | dep. {self.game.clock.format(next_serv.staph[self.game.player.sta.id][1])}", True, (255, 255, 255)), (10, 160))
+                self.screen.blit(self.genfont.render(f"next {self.game.player.kukan[1].name}", True, (255, 255, 255)), (10, 190))
 
         # Blit information when walking
         if self.game.player.F_wlking:
@@ -96,8 +98,8 @@ class MainWindow():
         if self.game.F_soukou:
             ki = self.game.player.serv.ki
             syu = self.game.player.serv.syu
-            self.screen.blit(self.genfont.render(f"{ki.name} {self.game.clock.format(self.game.player.serv.staph[ki.id][1])} > {syu.name} {self.game.clock.format(self.game.player.serv.staph[syu.id][0])}", True, (255, 255, 255)), (10, 130))
-            self.screen.blit(self.genfont.render(f"{self.game.player.kukan[1].name} arr. {self.game.clock.format(self.game.player.serv.staph[self.game.player.kukan[1].id][0])}", True, (255, 255, 255)), (10, 160))
+            self.screen.blit(self.genfont.render(f"{ki.name} {self.game.clock.format(self.game.player.serv.staph[ki.id][1])} > {syu.name} {self.game.clock.format(self.game.player.serv.staph[syu.id][0])}", True, (255, 255, 255)), (10, 160))
+            self.screen.blit(self.genfont.render(f"{self.game.player.kukan[1].name} arr. {self.game.clock.format(self.game.player.serv.staph[self.game.player.kukan[1].id][0])}", True, (255, 255, 255)), (10, 190))
 
         # Station menu
         if self.game.F_stmenu:
