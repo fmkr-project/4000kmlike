@@ -115,3 +115,8 @@ def handle_key_down(game, event):
     if event.key == pg.K_x and game.F_teisya:
         game.player.alight()
         return
+
+    # Train (enroute) - Toggle alight at the next stop
+    if event.key == pg.K_x and game.F_soukou:
+        game.F_kousya = not game.F_kousya
+        return

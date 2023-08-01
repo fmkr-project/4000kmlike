@@ -113,7 +113,9 @@ class Service():
         try:
             self.jifun = eval(times)
             # Convert from hmm / hhmm to hmmss / hhmmss
-            self.jifun = [time * 100 for time in self.jifun if time in range(0, 9999)]
+            for time in range(len(self.jifun)):
+                if self.jifun[time] in range(0, 9999):    # TODO fix this
+                    self.jifun[time] *= 100
         except:
             self.mg.game.logger.dump(f"[ERROR] in times: expected type list, found {times}")
         self.renketu = link

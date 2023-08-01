@@ -85,7 +85,7 @@ class Player:
                 self.sta = self.kukan[1]
                 self.game.F_teisya = True
                 self.kukan = self.serv.get_next_section(self.sta)
-                if self.kukan is None:
+                if self.kukan is None or self.game.F_kousya:
                     self.alight()
                     return
                 self.path = self.serv.get_path_from_section(self.kukan[0], self.kukan[1])
@@ -158,6 +158,7 @@ class Player:
         self.game.F_shinai = False
         self.game.F_soukou = False
         self.game.F_teisya = False
+        self.game.F_kousya = False
 
 
     def create_ticket(self):

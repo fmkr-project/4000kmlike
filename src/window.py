@@ -100,6 +100,12 @@ class MainWindow():
             syu = self.game.player.serv.syu
             self.screen.blit(self.genfont.render(f"{ki.name} {self.game.clock.format(self.game.player.serv.staph[ki.id][1])} > {syu.name} {self.game.clock.format(self.game.player.serv.staph[syu.id][0])}", True, (255, 255, 255)), (10, 160))
             self.screen.blit(self.genfont.render(f"{self.game.player.kukan[1].name} arr. {self.game.clock.format(self.game.player.serv.staph[self.game.player.kukan[1].id][0])}", True, (255, 255, 255)), (10, 190))
+            if self.game.F_kousya:
+                self.screen.blit(self.genfont.render("alight next", True, (255, 255, 255)), (10, 220))
+            # Controls
+            alight_str = "x: alight next" if not self.game.F_kousya else "x: cancel alight"
+            self.screen.blit(self.genfont.render(alight_str, True, (255, 255, 255)), (350, 10))
+
 
         # Station menu
         if self.game.F_stmenu:
@@ -189,7 +195,11 @@ class MainWindow():
                 deltas = [time - self.game.clock.get_hms() // 100 for time in list(self.dts.values())]
                 for i in range(len(deltas)):
                     deltas[i] = 9999 if deltas[i] < 0 else deltas[i]
-                self.arpos = deltas.index(min(deltas))
+                try:
+                    self.arpos = deltas.index(min(deltas))
+                except:
+                    # Guard when the last service has departed
+                    self.arpos = 0
 
             for i in range(len(self.dts)):
                 # TODO find a way to make tabulations work properly (or use a monospace font)
@@ -204,6 +214,10 @@ class MainWindow():
     
     def submit_dt(self):
         """Save the chosen Service in the player's data"""
+        if len(self.dts) == 0:
+            # No such Services have been defined in the DB
+            self.game.logger.dump("[INFORMATION] trying to use a non-existent deptime")
+            return
         if not self.game.F_choice:
             self.game.logger.dump("[WARNING] trying to submit a deptime outside of the deptime menu (this should not happen)")
         self.game.player.path = self.paths[self.choice_dir]

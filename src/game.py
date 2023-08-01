@@ -41,6 +41,7 @@ class Game:
         self.F_shinai = False       # City menu
         self.F_soukou = False       # Train menu (between Stations)
         self.F_teisya = False       # Train menu (at a Station)
+        self.F_kousya = False       # Alight at the next stop
 
         # Gameplay internals
         self.fast_forward = False
