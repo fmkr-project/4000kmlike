@@ -85,9 +85,14 @@ class ServManager():
         depts = {}
         for serv in self.servlist.values():
             # Check if the path contains start followed by end
-            for sta in range(len(serv.teisya)-1):
-                if serv.teisya[sta] == start and serv.teisya[sta+1] == end:
-                    depts[serv.id] = serv.jifun[2*sta] // 100               # Removing seconds
+            for sta in range(len(serv.keiro)-1):
+                if serv.keiro[sta] == start and serv.keiro[sta+1] == end:
+                    try:
+                        dep = serv.teisya.index(serv.keiro[sta])
+                        depts[serv.id] = serv.jifun[2*dep] // 100               # Removing seconds
+                    except:
+                        # The Serv passes this station
+                        pass
         sorted_depts = dict(sorted(depts.items(), key=lambda x: x[1]))
         return dict(zip(list(sorted_depts.keys()), list(sorted_depts.values())))
 

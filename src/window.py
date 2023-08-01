@@ -238,9 +238,7 @@ class MainWindow():
         self.game.player.serv = self.game.serv_manager.get_serv_by_id(list(self.dts.keys())[self.arpos])
         self.game.player.next_at = self.game.player.serv.staph[self.game.player.sta.id][0]
         self.game.player.next_dt = self.game.player.serv.staph[self.game.player.sta.id][1]
-        next_sta_id = self.game.player.serv.teisya[self.game.player.serv.teisya.index(self.game.player.sta.id) + 1]
-        # self.game.player.next_sta = self.game.sta_manager.get_sta_by_id(next_sta_id)
-        self.game.player.kukan = (self.game.player.sta, self.game.sta_manager.get_sta_by_id(next_sta_id))
+        self.game.player.kukan = self.game.player.serv.get_next_section(self.game.player.sta)
         # Create ticket information if the player doesn't have one
         if self.game.player.kippu is None:
             self.game.player.create_ticket()

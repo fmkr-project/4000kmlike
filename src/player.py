@@ -92,6 +92,8 @@ class Player:
                 if self.serv.staph_tei[self.kukan[0].id] != 'P':
                     self.game.F_teisya = True
                     self.game.F_soukou = False
+                else:
+                    self.update_tickets()
         elif self.game.F_teisya:
             hassya = self.serv.staph[self.kukan[0].id][1] if self.serv.syu != self.kukan[0] else None
             # Departure from a Station
