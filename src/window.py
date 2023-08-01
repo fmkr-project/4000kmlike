@@ -4,6 +4,8 @@ import math
 
 
 class MainWindow():
+    COLUMN_SIZE = 11                        # TODO manage screen redimension
+
     def __init__(self, game, width, height):
         self.game = game
 
@@ -190,6 +192,12 @@ class MainWindow():
             self.endpoints = (self.game.player.sta.id, list(self.neighbors.keys())[self.choice_dir])
             self.dts = self.game.serv_manager.get_deptimes(self.endpoints[0], self.endpoints[1])
             self.arbot = len(self.dts) - 1
+
+            # Multi-column display
+            self.nb_columns = len(self.dts) // self.COLUMN_SIZE
+            # TODO calculate column width, for now uses a placeholder value
+            self.column_width = 160
+
             # Initialize arrow position on opening
             if self.arpos is None:
                 deltas = [time - self.game.clock.get_hms() // 100 for time in list(self.dts.values())]
@@ -203,9 +211,11 @@ class MainWindow():
 
             for i in range(len(self.dts)):
                 # TODO find a way to make tabulations work properly (or use a monospace font)
-                self.screen.blit(self.genfont.render(f"{list(self.dts.values())[i]} > {self.game.serv_manager.get_serv_by_id(list(self.dts.keys())[i]).syu.name}", True, (255, 255, 255)), (30, 250 + 30*i))
+                pos = i % self.COLUMN_SIZE
+                dt_text = f"{list(self.dts.values())[i]} > {self.game.serv_manager.get_serv_by_id(list(self.dts.keys())[i]).syu.name}"
+                self.screen.blit(self.genfont.render(dt_text, True, (255, 255, 255)), (30 + self.column_width * (i // self.COLUMN_SIZE), 250 + 30*pos))
             # Display "arrow"
-            self.screen.blit(self.genfont.render('•', True, (255, 255, 255)), (10, 250 + 30*self.arpos))
+            self.screen.blit(self.genfont.render('•', True, (255, 255, 255)), (10 + self.column_width * (self.arpos // self.COLUMN_SIZE), 250 + 30*(self.arpos % self.COLUMN_SIZE)))
         else:
             self.arpos = None
         
