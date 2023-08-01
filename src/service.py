@@ -1,5 +1,8 @@
 from collections import OrderedDict
 
+import clock
+
+
 
 class ServManager():
     def __init__(self, game):
@@ -130,6 +133,9 @@ class Service():
         # Construct dict of stops with A and D times
         # TODO sta that are passed
         self.staph = OrderedDict()
+        for eki in self.keiro:
+            # Initialize the OrderedDict with "empty" values
+            self.staph[eki] = (-1, -1)
         for tei in range(len(self.teisya)):
             if tei == 0:
                 self.staph[self.teisya[0]] = (-1, self.jifun[0])
@@ -137,6 +143,49 @@ class Service():
                 self.staph[self.teisya[-1]] = (self.jifun[-1], -1)
             else:
                 self.staph[self.teisya[tei]] = (self.jifun[1+(tei-1)*2], self.jifun[2*tei])
+        # Keep track of stops and passages (for display purposes)
+        self.staph_tei = OrderedDict()
+        for eki in self.keiro:
+            self.staph_tei[eki] = 'P'
+        for tei in self.teisya:
+            self.staph_tei[tei] = 'S'
+        
+        # Complete staph & compute average speeds
+        self.hyotei = OrderedDict()
+        for path in self.path:
+            self.hyotei[path] = 0
+        hyotei_sokudo = 0
+        kukan_kyori = self.path[0].kyori
+        tot_time = 0                                        # In seconds
+        origin_path = 0                                     # Accumulator to store the first path of the current section
+        s_jikoku = self.staph[self.teisya[0]][1]            # Section enter time
+        for i in range(len(self.path)):
+            # Add to the current computed section while the Service does not stop
+            sec = (self.keiro[i], self.keiro[i+1])
+            path = self.path[i]
+            kukan_kyori += int(path.kyori * 1000)           # In m
+            if sec[1] not in self.teisya and i != len(self.path)-1:
+                continue
+
+            # At this point, the Service comes to a stop, calculate the average speed
+            tot_time = clock.sub_time(s_jikoku, self.staph[sec[1]][0])
+            hyotei_sokudo = 3.6 * kukan_kyori / tot_time    # In km/h
+            for p in range(origin_path, i+1):
+                self.hyotei[self.path[p]] = hyotei_sokudo
+            # Prepare for next computation
+            kukan_kyori = 0
+            s_jikoku = self.staph[sec[1]][1]                # -1 = terminus = no more computations
+            origin_path = i+1
+        
+        # Compute passing times and add them to staph
+        for i in range(len(self.path)):
+            if self.staph[self.keiro[i+1]] == (-1, -1):
+                syoyou = 1000 * self.path[i].kyori / (self.hyotei[self.path[i]] / 3.6)            # in s
+                # Calculate passing time
+                # TODO might want to create a function in the clock module
+                pass_time = clock.tosec_hms(self.staph[self.keiro[i]][1]) + syoyou
+                pass_time_normalized = int((pass_time // 3600) * 10000 + ((pass_time % 3600) // 60) * 100 + (pass_time % 60))
+                self.staph[self.keiro[i+1]] = (pass_time_normalized, pass_time_normalized)
         
         # String representation (for display purposes)
         # TODO should not be None
@@ -149,12 +198,12 @@ class Service():
     
     def get_next_section(self, sta):
         """Get section starting with specified station"""
-        if sta.id == self.teisya[-1]:
+        if sta.id == self.keiro[-1]:
             # Case when sta is the terminal station
             return None
-        for i in range(len(self.teisya)-1):
-            if self.teisya[i] == sta.id:
-                return (self.mg.game.sta_manager.get_sta_by_id(self.teisya[i]), self.mg.game.sta_manager.get_sta_by_id(self.teisya[i+1]))
+        for i in range(len(self.keiro)-1):
+            if self.keiro[i] == sta.id:
+                return (self.mg.game.sta_manager.get_sta_by_id(self.keiro[i]), self.mg.game.sta_manager.get_sta_by_id(self.keiro[i+1]))
         return None
 
     def get_path_from_section(self, start, end):

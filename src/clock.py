@@ -2,6 +2,21 @@ import pygame as pg
 
 
 
+def sub_time(start, end):
+    """Return the difference between start and end in seconds"""
+    start_hms = (start // 10000, (start % 10000) // 100, start % 100)
+    end_hms = (end // 10000, (end % 10000) // 100, end % 100)
+    return tosec(end_hms) - tosec(start_hms)
+
+def tosec(timestamp):
+    """Convert a timestamp in [h, m, s] format to seconds"""
+    return 3600*timestamp[0] + 60*timestamp[1] + timestamp[2]
+
+def tosec_hms(hms):
+    """Convert a timestamp in hhmmss format to seconds"""
+    return 3600*(hms//10000) + 60*((hms%10000)//100) + hms%100
+
+
 class Clock():
     TIME_TICK = 25
     TIME_TICK_ACCEL = 2

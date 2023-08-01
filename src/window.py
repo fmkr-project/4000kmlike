@@ -206,7 +206,7 @@ class MainWindow():
                 try:
                     self.arpos = deltas.index(min(deltas))
                 except:
-                    # Guard when the last service has departed
+                    # Guard when there is no service to choose from
                     self.arpos = 0
 
             for i in range(len(self.dts)):
