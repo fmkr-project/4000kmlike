@@ -83,10 +83,10 @@ class Player:
             # Arrival at a Station
             if self.game.clock.get_hms() >= touchaku:
                 self.sta = self.kukan[1]
-                if (self.kukan is None or self.game.F_kousya) and self.serv.staph_tei[self.kukan[1].id] != 'P':
+                self.kukan = self.serv.get_next_section(self.sta)
+                if self.kukan is None or (self.game.F_kousya and self.serv.staph_tei[self.kukan[0].id] != 'P'):
                     self.alight()
                     return
-                self.kukan = self.serv.get_next_section(self.sta)
                 self.path = self.serv.get_path_from_section(self.kukan[0], self.kukan[1])
                 # Update game flags on stop
                 if self.serv.staph_tei[self.kukan[0].id] != 'P':

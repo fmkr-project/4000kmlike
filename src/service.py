@@ -206,6 +206,17 @@ class Service():
                 return (self.mg.game.sta_manager.get_sta_by_id(self.keiro[i]), self.mg.game.sta_manager.get_sta_by_id(self.keiro[i+1]))
         return None
 
+    def get_next_stop(self, id):
+        """Get arrival time to the next Station & its id, where id is the id of the current Station."""
+        if id not in self.keiro or id == self.syu.id:
+            return None
+        i = 0
+        while self.keiro[i] != id:
+            i += 1
+        while self.staph_tei[self.keiro[i+1]] == 'P':
+            i += 1
+        return (self.keiro[i+1], self.staph[self.keiro[i+1]][0])
+
     def get_path_from_section(self, start, end):
         """Return the path of this Service between the specified endpoints"""
         for path in self.path:
