@@ -1,4 +1,6 @@
 import pygame as pg
+import tkinter as tk
+import tkinter.messagebox as msg
 import math
 
 
@@ -306,3 +308,32 @@ class MainWindow():
         """Leave shop and go back to station menu"""
         self.game.F_stmenu = True
         self.shopmenu = None
+
+
+class PauseMenu(tk.Toplevel):
+    def __init__(self, game):
+        # This is a Singleton
+        self.game = game
+
+        # Initialize window
+        self.root = tk.Tk()
+        self.root.title("4000kmlike")
+        self.buttons = []
+        self.buttons.append(tk.Button(self.root, text = "      resume      ", command = self.kill))
+        self.buttons.append(tk.Button(self.root, text = "      load      "))#, command = lambda self: self.game.load())
+        self.buttons.append(tk.Button(self.root, text = "      save      "))#, command = lambda self: self.game.save())
+        self.buttons.append(tk.Button(self.root, text = "      exit      ", command = self.prompt))
+        for i in range(len(self.buttons)):
+            self.buttons[i].grid(row = 0, column = i)
+        self.root.mainloop()
+    
+    def prompt(self):
+        """Asks the player for game exiting"""
+        if msg.askyesno(title = "4000kmlike", message = "exit?"):
+            self.kill()
+            self.game.quit_game()
+    
+    def kill(self):
+        """Destroy this window and resets the game's pause menu"""
+        self.game.pause_menu = None
+        self.root.destroy()

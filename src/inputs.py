@@ -13,7 +13,7 @@ def handle_key_down(game, event):
 
     # Exit event
     if event.key == pg.K_ESCAPE:
-        game.running = False
+        game.pause()
         return
     
     # Fast forward

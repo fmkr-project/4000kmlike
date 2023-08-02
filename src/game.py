@@ -32,6 +32,7 @@ class Game:
         self.logger.dump("pygame initialized")
         self.logger.dump("Creating main window")
         self.main_window = window.MainWindow(self, self.MAIN_WINDOW_DEFAULT_SIZE[0], self.MAIN_WINDOW_DEFAULT_SIZE[1])
+        self.pause_menu = None
 
         # Flags
         self.F_stmenu = True        # Generic menu at a Station. Game always starts at a station
@@ -93,6 +94,7 @@ class Game:
 
         while self.running:
             self.tick()
+            self.pause_menu = None
 
             # pg event management
             for event in pg.event.get():
@@ -124,7 +126,16 @@ class Game:
         pg.display.quit()
         pg.quit()
         self.logger.dump("Game exit complete.")
+        del(self)   # TODO there has to be a cleaner way
 
+
+    def pause(self):
+        """Opens the pause menu and waits for it to be closed"""
+        if self.pause_menu is None:
+            self.pause_menu = window.PauseMenu(self)
+        else:
+            del(self.pause_menu)
+            self.pause_menu = None
 
     def update(self):
         """Update game information when time changes"""
