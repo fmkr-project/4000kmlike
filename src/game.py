@@ -32,6 +32,7 @@ class Game:
         self.logger.dump("pygame initialized")
         self.logger.dump("Creating main window")
         self.main_window = window.MainWindow(self, self.MAIN_WINDOW_DEFAULT_SIZE[0], self.MAIN_WINDOW_DEFAULT_SIZE[1])
+        pg.display.set_caption('4000kmlike')
         self.pause_menu = None
 
         # Flags
