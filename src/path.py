@@ -4,7 +4,10 @@ class PathManager():
         self.pathlist = {}
 
         for path in self.game.data.execute("select * from path").fetchall():
-            self.pathlist[path[0]] = Path(path[0], path[1], path[2], path[3], path[4], path[5], path[6])
+            if path[1] == "" and path[2] == "":
+                self.game.logger.dump(f"[INFO] skipping path {path[0]} as it has no data (buffer line)")
+            else:
+                self.pathlist[path[0]] = Path(path[0], path[1], path[2], path[3], path[4], path[5], path[6], path[7])
     
 
     def integrity_check(self):
@@ -71,7 +74,7 @@ class PathManager():
 
 
 class Path:
-    def __init__(self, id, start, end, name, lg, onfoot, tarification):
+    def __init__(self, id, start, end, name, lg, onfoot, tarification, road):
         self.id = id
         self.start = start
         self.end = end
@@ -80,4 +83,5 @@ class Path:
         self.renraku = onfoot
         self.ftype = tarification
         
+        self.is_road = road
         self.used = False

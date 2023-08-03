@@ -15,7 +15,7 @@ class ServManager():
             if serv[6] in (None, "") and serv[7] in (None, "") and serv[8] in (None, ""):
                 self.game.logger.dump(f"[INFO] skipping service {serv[0]} as it has no data (buffer line)")
                 continue
-            new = Service(self, serv[0], serv[2], serv[3], serv[4],serv[5], serv[6], serv[7], serv[8], serv[9], serv[10])
+            new = Service(self, serv[0], serv[2], serv[3], serv[4],serv[5], serv[6], serv[7], serv[8], serv[9], serv[10], serv[11])
             self.servlist[serv[0]] = new
 
     def get_comps(self):
@@ -86,7 +86,7 @@ class ServManager():
         for serv in self.servlist.values():
             # Check if the path contains start followed by end
             for sta in range(len(serv.keiro)-1):
-                if serv.keiro[sta] == start and serv.keiro[sta+1] == end:
+                if serv.keiro[sta] == start and serv.keiro[sta+1] == end and serv.is_servicing(self.game.clock.weekday):
                     try:
                         dep = serv.teisya.index(serv.keiro[sta])
                         depts[serv.id] = serv.jifun[2*dep] // 100               # Removing seconds
@@ -98,7 +98,7 @@ class ServManager():
 
 
 class Service():
-    def __init__(self, mg, id, stype, nb, comp, name, path, stops, times, link, supp_fare):
+    def __init__(self, mg, id, stype, nb, comp, name, path, stops, times, link, supp_fare, days):
         self.mg = mg
         self.mg.game.logger.dump(f"Creating service of id {id}")
 
@@ -128,6 +128,10 @@ class Service():
             self.mg.game.logger.dump(f"[ERROR] in times: expected type list, found {times}")
         self.renketu = link
         self.yuuryou = supp_fare if supp_fare != "" else None
+        try:
+            self.untenhi = int(days)
+        except:
+            self.untenhi = 1234567
 
         # Calculated attributes
         self.path = self.mg.game.path_manager.build_path(self.keiro)
@@ -194,12 +198,18 @@ class Service():
         
         # String representation (for display purposes)
         # TODO should not be None
-        self.name_tostring = self.syubetu if self.syubetu is not None else "local"
-        if self.name_tostring != "local":           # TODO placeholder
-            self.name_tostring += f" <{self.meisyo}" if self.meisyo is not None else ""
-            self.name_tostring += f" {self.bangou}>" if self.bangou is not None else ">" if self.meisyo is not None else ""
-        self.name_tostring += f" for {self.mg.game.sta_manager.get_sta_by_id(self.keiro[-1]).name}"
+        if self.syubetu is None and self.bangou is not None:
+            self.name_tostring = f"[{self.bangou}]"
+        else:
+            self.name_tostring = self.syubetu if self.syubetu is not None else "local"
+            if self.name_tostring != "local":           # TODO placeholder
+                self.name_tostring += f" <{self.meisyo}" if self.meisyo is not None else ""
+                self.name_tostring += f" {self.bangou}>" if self.bangou is not None else ">" if self.meisyo is not None else ""
+            self.name_tostring += f" for {self.mg.game.sta_manager.get_sta_by_id(self.keiro[-1]).name}"
 
+    def is_servicing(self, weekday):
+        """Returns True if the service operates on the current day"""
+        return str(weekday) in str(self.untenhi)
     
     def get_next_section(self, sta):
         """Get section starting with specified station"""

@@ -40,6 +40,12 @@ class StaManager:
             res[path[0]] = path[1]
         return res
 
+    def is_busterm(self, sta_id):
+        """Returns True if the given Station is a bus terminal, ie. has only roads departing from it"""
+        data = [path[0] for path in self.game.data.execute(f"select road from path where start = {sta_id} or end = {sta_id}").fetchall()]
+        return data == ['1' for _ in data]
+
+
 
 class Station:
     def __init__(self, mg, id, name, coords):

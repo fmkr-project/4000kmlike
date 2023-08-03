@@ -31,6 +31,7 @@ class Clock():
 
         self.month = 7
         self.day = 1
+        self.weekday = 1
         self.season = None
 
         self.hour = 6
@@ -75,6 +76,9 @@ class Clock():
                     if self.hour >= 24:
                         self.hour = 0
                         self.day += 1
+                        self.weekday += 1
+                        if self.weekday >= 8:
+                            self.weekday = 0
                         if self.day >= self.MONTH_LENGTHS[self.month-1]:
                             self.day = 0
                             self.month += 1
