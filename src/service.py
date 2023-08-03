@@ -139,6 +139,17 @@ class Service():
         self.syu = self.mg.game.sta_manager.get_sta_by_id(self.keiro[-1])
         self.keiyu = self.mg.game.path_manager.build_linenames(self.mg.game.path_manager.build_path(self.keiro))
 
+        # Verify that the path is homogeneous, ie. only has railway paths OR road paths
+        pathtypes = [path.is_road for path in self.path]
+        if pathtypes == [1 for _ in pathtypes]:
+            self.is_train = False
+            self.is_bus = True
+        elif pathtypes == [0 for _ in pathtypes]:
+            self.is_bus = False
+            self.is_train = True
+        else:
+            self.mg.game.logger.dump(f"[ERROR] in service {self.id}: paths are not all rail-only or road-only")
+
         # Construct dict of stops with A and D times
         # TODO sta that are passed
         self.staph = OrderedDict()
