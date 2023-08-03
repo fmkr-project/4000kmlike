@@ -320,11 +320,14 @@ class PauseMenu(tk.Toplevel):
         self.root.title("4000kmlike")
         self.buttons = []
         self.buttons.append(tk.Button(self.root, text = "      resume      ", command = self.kill))
-        self.buttons.append(tk.Button(self.root, text = "      load      "))#, command = lambda self: self.game.load())
-        self.buttons.append(tk.Button(self.root, text = "      save      "))#, command = lambda self: self.game.save())
-        self.buttons.append(tk.Button(self.root, text = "      exit      ", command = self.prompt))
+        self.buttons.append(tk.Button(self.root, text = "       load       "))#, command = lambda self: self.game.load())
+        self.buttons.append(tk.Button(self.root, text = "       save       "))#, command = lambda self: self.game.save())
+        self.buttons.append(tk.Button(self.root, text = "       exit       ", command = self.prompt))
+        stats = self.game.player.stats_tostring()
+        for elt in range(len(stats)):
+            tk.Label(self.root, text = stats[elt]).grid(row = elt, column = 0)
         for i in range(len(self.buttons)):
-            self.buttons[i].grid(row = 0, column = i)
+            self.buttons[i].grid(row = i, column = 1)
         self.root.mainloop()
     
     def prompt(self):

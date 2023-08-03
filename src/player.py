@@ -45,9 +45,13 @@ class Player:
         self.F_wlking = False
 
         # Record attributes
-        # TODO
-        self.soukiro = 0
-    
+        self.ressya_record = 0      # Sum of the lengths of already taken paths
+        self.bus_record = 0
+        self.ressya_soukiro = 0     # Total distance travelled
+        self.bus_soukiro = 0
+        self.walked_dist = 0
+
+
 
     def update(self):
         """Update player properties on time change"""
@@ -100,6 +104,23 @@ class Player:
             if self.game.clock.get_hms() >= hassya:
                 self.game.F_teisya = False
                 self.game.F_soukou = True
+                if not self.path.used:
+                    self.path.used = True
+                    record_mul = 1
+                else:
+                    record_mul = 0
+                if self.serv.is_train:
+                    self.ressya_soukiro += self.path.kyori
+                    self.ressya_record += self.path.kyori * record_mul
+                if self.serv.is_bus:
+                    self.bus_soukiro += self.path.kyori
+                    self.bus_record += self.path.kyori * record_mul
+                # Round statistics to account for floating point errors
+                self.ressya_soukiro = round(self.ressya_soukiro, 1)
+                self.ressya_record = round(self.ressya_record, 1)
+                self.bus_soukiro = round(self.bus_soukiro, 1)
+                self.bus_record = round(self.bus_record, 1)
+                
                 self.update_tickets()
         else:
             # Arrival of a Service when the player waits at a Station
@@ -215,3 +236,10 @@ class Player:
     def gameover(self):
         """Check if the player can no longer continue"""
         return self.cash <= 0 or self.hp <= 0
+
+
+    # Functions for pause menu statistics
+    def stats_tostring(self):
+        return (f"bus: current {self.bus_record} km, total {self.game.path_manager.bus_total_dist()} km",
+                f"train: current {self.ressya_record} km, total {self.game.path_manager.train_total_dist()} km",
+                f"all: current {self.bus_record + self.ressya_record} km, total {self.game.path_manager.bus_total_dist() + self.game.path_manager.train_total_dist()} km")

@@ -71,6 +71,14 @@ class PathManager():
                 linenames.append(path.rosen)
         return linenames
 
+    
+    # Functions for pause menu statistics
+    def bus_total_dist(self):
+        return sum([path.kyori for path in self.pathlist.values() if path.is_road])
+    
+    def train_total_dist(self):
+        return sum([path.kyori for path in self.pathlist.values() if not path.is_road])
+
 
 
 class Path:
