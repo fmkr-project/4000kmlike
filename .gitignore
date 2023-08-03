@@ -6,3 +6,5 @@ dump*
 build/*
 dist/*
 *.spec
+
+*.exe
