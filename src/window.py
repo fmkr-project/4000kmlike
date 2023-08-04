@@ -50,7 +50,7 @@ class MainWindow():
         self.screen.blit(self.genfont.render(f"{self.game.clock.day}", True, (255, 255, 255)), (10, 10))
         self.screen.blit(self.genfont.render(self.game.clock.format(self.game.clock.get_hms()), True, (255, 255, 255)), (10, 40))
         if self.game.fast_forward:
-            self.screen.blit(self.genfont.render('F', True, (255, 255, 255)), (140, 25))
+            self.screen.blit(self.genfont.render('F', True, (255, 255, 255)), (140, 10))
 
         # Blit the name of the player's position
         # TODO function to determine if sta & service data can be displayed
@@ -218,7 +218,10 @@ class MainWindow():
             for i in range(len(self.dts)):
                 # TODO find a way to make tabulations work properly (or use a monospace font)
                 pos = i % self.COLUMN_SIZE
-                dt_text = f"{list(self.dts.values())[i]} > {self.game.serv_manager.get_serv_by_id(list(self.dts.keys())[i]).syu.name}"
+                # Correctly display times >= 0:00
+                corrected_dt = list(self.dts.values())[i]
+                corrected_dt = corrected_dt - 2400 if corrected_dt > 2359 else corrected_dt
+                dt_text = f"{corrected_dt:04} > {self.game.serv_manager.get_serv_by_id(list(self.dts.keys())[i]).syu.name}"
                 self.screen.blit(self.genfont.render(dt_text, True, (255, 255, 255)), (30 + self.column_width * (i // self.COLUMN_SIZE), 250 + 30*pos))
             # Display "arrow"
             self.screen.blit(self.genfont.render('•', True, (255, 255, 255)), (10 + self.column_width * (self.arpos // self.COLUMN_SIZE), 250 + 30*(self.arpos % self.COLUMN_SIZE)))

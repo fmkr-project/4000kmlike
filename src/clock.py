@@ -14,6 +14,8 @@ def tosec(timestamp):
 
 def tosec_hms(hms):
     """Convert a timestamp in hhmmss format to seconds"""
+    if hms//10000 < 3:
+        hms += 240000       # Cancel 0:00 rollback
     return 3600*(hms//10000) + 60*((hms%10000)//100) + hms%100
 
 
@@ -21,6 +23,8 @@ class Clock():
     TIME_TICK = 25
     TIME_TICK_ACCEL = 2
     MONTH_LENGTHS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+    INITIAL_DATE = (7, 1)
+    INITIAL_TIME = (5, 0, 0)
 
     def __init__(self, game):
         self.game = game
@@ -34,8 +38,9 @@ class Clock():
         self.weekday = 1
         self.season = None
 
-        self.hour = 6
-        self.minute = 15
+        # TODO replace with initial values in production
+        self.hour = 21
+        self.minute = 0
         self.second = 0
 
     def set(self, h, m, s=0):
@@ -46,17 +51,16 @@ class Clock():
     
     def format(self, timestamp):
         """Format a timestamp (hhmm or hhmmss format) into hh:mm:ss format"""
-        # TODO #9
         if timestamp in range(0, 9999):
             # hhmm
             return f"{timestamp // 100:02}:{timestamp % 100:02}:00"
         elif timestamp in range(10000, 999999):
-            # hhmmss
-            return f"{timestamp // 10000:02}:{timestamp % 10000 // 100:02}:{timestamp % 100:02}"
+            # hhmmss, with rollback between 24:00 (0:00) and 26:59 (2:59)
+            return f"{timestamp // 10000:02}:{timestamp % 10000 // 100:02}:{timestamp % 100:02}" if timestamp // 10000 < 24 else f"{timestamp // 10000 - 24:02}:{timestamp % 10000 // 100:02}:{timestamp % 100:02}"
     
     def get_hms(self):
         """Return the current time in hhmmss format"""
-        return self.hour * 10000 + self.minute * 100 + self.second
+        return self.hour * 10000 + self.minute * 100 + self.second if self.hour >= 3 else (self.hour + 24) * 10000 + self.minute * 100 + self.second
     
     def tick(self):
         """Operations after a pygame tick"""

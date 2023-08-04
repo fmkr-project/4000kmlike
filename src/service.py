@@ -43,15 +43,13 @@ class ServManager():
                     self.game.logger.dump(f"[WARNING] in service of id {serv.id}: station id {sta} does not belong to the path")
             
             # times in ascending order
-            # TODO #3 yakou
-            # TODO #2 use ordereddict structure
             for i in range(len(serv.jifun)-1):
                 if serv.jifun[i] > serv.jifun[i+1]:
                     self.game.logger.dump(f"[WARNING] in service of id {serv.id}: time {serv.jifun[i]} is before time {serv.jifun[i+1]}")
-
+                    self.game.logger.dump(f"[WARNING] For the rollback at 0:00 to occur correctly, 0:00 should be read as 2400, 1:00 as 2500 and 2:00 as 2600.")
             for i in range(1, stopnum-1):
                 if serv.jifun[1 + (i-1)*2] == serv.jifun[i*2]:
-                    self.game.logger.dump(f"[WARNING] in service of id {serv.id}: station id {serv.teisya[i]} has stopping time of 0 (@{serv.jifun[i*2]}), will be skipped")
+                    self.game.logger.dump(f"[INFORMATION] in service of id {serv.id}: station id {serv.teisya[i]} has stopping time of 0 (@{serv.jifun[i*2]}), will be skipped")
 
         # Times check
         for serv in self.servlist.values():
@@ -122,7 +120,7 @@ class Service():
             self.jifun = eval(times)
             # Convert from hmm / hhmm to hmmss / hhmmss
             for time in range(len(self.jifun)):
-                if self.jifun[time] in range(0, 9999):    # TODO fix this
+                if self.jifun[time] in range(0, 9999):
                     self.jifun[time] *= 100
         except:
             self.mg.game.logger.dump(f"[ERROR] in times: expected type list, found {times}")

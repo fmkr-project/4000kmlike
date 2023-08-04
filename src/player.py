@@ -126,7 +126,6 @@ class Player:
             # Arrival of a Service when the player waits at a Station
             if self.next_at is not None and self.game.clock.get_hms() >= self.next_at and self.game.clock.get_hms() <= self.next_dt:
                 # Update Player properties
-                # TODO load new times
                 self.next_at = None
 
                 # Update game flags
