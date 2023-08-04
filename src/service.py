@@ -54,7 +54,7 @@ class ServManager():
         # Times check
         for serv in self.servlist.values():
             for time in serv.jifun:
-                if (time // 10000 not in range(0,24) or (time % 10000) // 100 not in range(0,60) or time % 100 not in range(0,60)):
+                if (time // 10000 not in range(3,27) or (time % 10000) // 100 not in range(0,60) or time % 100 not in range(0,60)):
                     self.game.logger.dump(f"[WARNING] in service of id {serv.id}: time {time} does not match format [h]hmmss")
 
         # Route check
