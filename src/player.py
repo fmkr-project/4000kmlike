@@ -240,6 +240,6 @@ class Player:
 
     # Functions for pause menu statistics
     def stats_tostring(self):
-        return (f"bus: current {self.bus_record} km, total {self.game.path_manager.bus_total_dist()} km",
-                f"train: current {self.ressya_record} km, total {self.game.path_manager.train_total_dist()} km",
-                f"all: current {self.bus_record + self.ressya_record} km, total {self.game.path_manager.bus_total_dist() + self.game.path_manager.train_total_dist()} km")
+        return (f"bus: current {self.bus_record} km of {self.game.path_manager.bus_total_dist()} km, total {self.bus_soukiro} km",
+                f"train: current {self.ressya_record} km of {self.game.path_manager.train_total_dist()} km, total {self.ressya_soukiro} km",
+                f"all: current {self.bus_record + self.ressya_record} km of {self.game.path_manager.bus_total_dist() + self.game.path_manager.train_total_dist()} km, total {self.bus_soukiro + self.ressya_soukiro} km")
