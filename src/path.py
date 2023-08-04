@@ -74,10 +74,10 @@ class PathManager():
     
     # Functions for pause menu statistics
     def bus_total_dist(self):
-        return sum([path.kyori for path in self.pathlist.values() if path.is_road])
+        return round(sum([path.kyori for path in self.pathlist.values() if path.is_road]), 1)
     
     def train_total_dist(self):
-        return sum([path.kyori for path in self.pathlist.values() if not path.is_road])
+        return round(sum([path.kyori for path in self.pathlist.values() if not path.is_road]), 1)
 
 
 

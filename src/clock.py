@@ -40,8 +40,8 @@ class Clock():
         self.season = None
 
         # TODO replace with initial values in production
-        self.hour = 21
-        self.minute = 50
+        self.hour = 6
+        self.minute = 0
         self.second = 0
 
     def set(self, h, m, s=0):

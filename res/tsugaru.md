@@ -50,6 +50,36 @@
 
 ### Konan Bus
 
+#### <97> Goshogawara - Aomori Line
+
+- Goshogawara-ekimae [10011]
+- Daishaka-ekidori [10019]
+- Shinjo-ekimae [10020]
+- Shin-aomori-ekimae [10021]
+- Aomori-ekimae [10022]
+- Aomori-eigyosho [10023]
+
+
+#### <101> Goshogawara - Toyokawa Line
+
+- Goshogawara-eigyosho [10010]
+- Goshogawara-ekimae [10011]
+- Toyokawa [10015]
+
+#### <104> Nanawa Line
+
+- Goshogawara-eigyosho [10010]
+- Goshogawara-ekimae [10011]
+- ELM [10016]
+- Kami-koya [10017]
+
+
+#### <108> Mogawa Line
+
+- Goshogawara-eigyosho [10010]
+- Goshogawara-ekimae [10011]
+- Shimo-mogawa [10018]
+
 #### <111> Goshogawara - Ajigasawa Line
 
 - Goshogawara-eigyosho [10010]
@@ -64,3 +94,7 @@
 - [0] <> [1500]
 - [0] <> [10011]
 - [100] <> [10013]
+- [203] <> [10019]
+- [204] <> [10020]
+- [205] <> [10021]
+- [206] <> [10022]
