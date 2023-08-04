@@ -47,6 +47,7 @@ class Game:
 
         # Gameplay internals
         self.fast_forward = False
+        self.pass_night = False
 
         # Lower level internals
 
@@ -75,6 +76,7 @@ class Game:
 
         # Integrity checks
         self.logger.dump("Running integrity checks")
+        self.sta_manager.build_optimes()
         self.path_manager.integrity_check()
         self.serv_manager.integrity_check()
 

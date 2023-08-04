@@ -42,8 +42,21 @@ class StaManager:
 
     def is_busterm(self, sta_id):
         """Returns True if the given Station is a bus terminal, ie. has only roads departing from it"""
-        data = [path[0] for path in self.game.data.execute(f"select road from path where start = {sta_id} or end = {sta_id}").fetchall()]
-        return data == ['1' for _ in data]
+        data = [path[0] for path in self.game.data.execute(f"select road from path where (start = {sta_id} or end = {sta_id}) and onfootonly = 0").fetchall()]
+        return data == [1 for _ in data]
+    
+    def build_optimes(self):
+        """For every existing station, compute its opening times"""
+        for sta in list(self.stalist.values()):
+            if self.is_busterm(sta.id):             # TODO Bus stops don't close (for now)
+                sta.open_time = (30000, 270000)
+            else:
+                dtimes = self.game.serv_manager._all_deptimes(sta.id)
+                # Calculate opening times = 1 hour before / after the first / last Service and round to the nearest hour
+                # Account for rollback at 0:00
+                kai = min(dtimes) - 10000 if min(dtimes) - 10000 >= 30000 else min(dtimes) + 230000
+                hei = max(dtimes) + 10000 if max(dtimes) + 10000 < 270000 else max(dtimes) - 230000
+                sta.open_time = (kai - kai%10000, hei - hei%10000)
 
 
 
@@ -59,3 +72,4 @@ class Station:
 
         # Gameplay internals
         self.shops = []
+        self.open_time = None

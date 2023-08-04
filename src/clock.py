@@ -22,6 +22,7 @@ def tosec_hms(hms):
 class Clock():
     TIME_TICK = 25
     TIME_TICK_ACCEL = 2
+    TIME_TICK_SUPERACCEL = 1
     MONTH_LENGTHS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
     INITIAL_DATE = (7, 1)
     INITIAL_TIME = (5, 0, 0)
@@ -40,7 +41,7 @@ class Clock():
 
         # TODO replace with initial values in production
         self.hour = 21
-        self.minute = 0
+        self.minute = 50
         self.second = 0
 
     def set(self, h, m, s=0):
@@ -65,7 +66,8 @@ class Clock():
     def tick(self):
         """Operations after a pygame tick"""
         self.ticks_since_timechange += 1
-        corrected_tick = self.TIME_TICK_ACCEL if self.game.fast_forward else self.TIME_TICK
+        corrected_tick = self.TIME_TICK_ACCEL if (self.game.fast_forward and not self.game.pass_night) or (not self.game.fast_forward and self.game.pass_night)\
+                         else self.TIME_TICK_SUPERACCEL if self.game.fast_forward and self.game.pass_night else self.TIME_TICK
 
         # Update time
         if self.ticks_since_timechange >= corrected_tick:

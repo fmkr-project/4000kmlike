@@ -51,6 +51,8 @@ class MainWindow():
         self.screen.blit(self.genfont.render(self.game.clock.format(self.game.clock.get_hms()), True, (255, 255, 255)), (10, 40))
         if self.game.fast_forward:
             self.screen.blit(self.genfont.render('F', True, (255, 255, 255)), (140, 10))
+        if self.game.pass_night:
+            self.screen.blit(self.genfont.render('¤', True, (255, 255, 255)), (140, 40))
 
         # Blit the name of the player's position
         # TODO function to determine if sta & service data can be displayed
@@ -323,9 +325,9 @@ class PauseMenu(tk.Toplevel):
         self.root.title("4000kmlike")
         self.buttons = []
         self.buttons.append(tk.Button(self.root, text = "      resume      ", command = self.kill))
-        self.buttons.append(tk.Button(self.root, text = "       load       "))#, command = lambda self: self.game.load())
-        self.buttons.append(tk.Button(self.root, text = "       save       "))#, command = lambda self: self.game.save())
-        self.buttons.append(tk.Button(self.root, text = "       exit       ", command = self.prompt))
+        self.buttons.append(tk.Button(self.root, text = "        load        "))#, command = lambda self: self.game.load())
+        self.buttons.append(tk.Button(self.root, text = "        save        "))#, command = lambda self: self.game.save())
+        self.buttons.append(tk.Button(self.root, text = "        exit        ", command = self.prompt))
         stats = self.game.player.stats_tostring()
         for elt in range(len(stats)):
             tk.Label(self.root, text = stats[elt]).grid(row = elt, column = 0)

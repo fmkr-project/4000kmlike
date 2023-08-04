@@ -80,6 +80,10 @@ class Player:
 
     def tick(self):
         """Update player properties every tick"""
+        # Night time operations
+        if not self.game.F_soukou:
+            stime = self.sta.open_time
+            self.game.pass_night = False if self.game.clock.get_hms() in range(stime[0], stime[1]+1) else True
         # Case when the player is already boarding a Service
         # At this point, the player already owns a ticket
         if self.game.F_soukou:

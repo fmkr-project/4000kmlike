@@ -93,6 +93,15 @@ class ServManager():
                         pass
         sorted_depts = dict(sorted(depts.items(), key=lambda x: x[1]))
         return dict(zip(list(sorted_depts.keys()), list(sorted_depts.values())))
+    
+    def _all_deptimes(self, sta_id):
+        """Returns the departure times of all Servicesusing the specified Station"""
+        res = []
+        for serv in self.servlist.values():
+            for sta in serv.teisya:
+                if sta == sta_id:
+                    res.append(serv.staph[sta][1]) if serv.staph[sta][1] != -1 else res.append(serv.staph[sta][0])
+        return res
 
 
 class Service():
