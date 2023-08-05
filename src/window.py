@@ -7,6 +7,7 @@ import math
 
 class MainWindow():
     COLUMN_SIZE = 11                        # TODO manage screen redimension
+    FONT_PATH = "res/Mplus1-Bold.ttf"
 
     def __init__(self, game, width, height):
         self.game = game
@@ -16,9 +17,9 @@ class MainWindow():
         self.halves = [self.dimensions[0] // 2, self.dimensions[1] // 2]
         self.screen = pg.display.set_mode(self.dimensions)
 
-        self.genfont = pg.font.Font(None, 40)               # General purpose font
-        self.bigfont = pg.font.Font(None, 70)               # Font for important information
-        self.detfont = pg.font.Font(None, 25)               # Font for less important details
+        self.genfont = pg.font.Font(self.FONT_PATH, 23)               # General purpose font
+        self.bigfont = pg.font.Font(self.FONT_PATH, 46)               # Font for important information
+        self.detfont = pg.font.Font(self.FONT_PATH, 16)               # Font for less important details
 
         # Internals
         self.neighbors = None
@@ -202,7 +203,7 @@ class MainWindow():
             # Multi-column display
             self.nb_columns = len(self.dts) // self.COLUMN_SIZE
             # TODO calculate column width, for now uses a placeholder value
-            self.column_width = 160
+            self.column_width = 180
 
             # Initialize arrow position on opening
             if self.arpos is None:
