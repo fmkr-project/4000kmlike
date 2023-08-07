@@ -9,6 +9,17 @@
 
 #### Ou Main Line
 
+- Akita [219]
+- Oiwake [218]
+- Ikawa-sakura [217]
+- Hachirogata [216]
+- Higashi-noshiro [103]
+- Futatsui [215]
+- Takanosu [214]
+- Odate [213]
+- Tsugaru-yunosawa [212]
+- Ikarigaseki [211]
+- Owani-onsen [210]
 - Hirosaki [200]
 - Kawabe [102]
 - Kita-tokiwa [201]
