@@ -6,7 +6,36 @@ import math
 
 
 class MainWindow():
-    COLUMN_SIZE = 11                        # TODO manage screen redimension
+    MIN_SIZE = (750, 600)                   # Minimum screen size
+    RESERVED_HEIGHT = 400                   # Header + footer height
+    DT_LINE_HEIGHT = 30
+    AR_OFFSET = 60                          # Space between two columns in the dt menu
+
+    # Window structure:
+
+    ########################################################
+    #                                                      #
+    #           Header (time, commands) - 250px            #
+    #                                                      #
+    ########################################################
+    #                                                      #
+    #                                                      #
+    #                                                      #
+    #                                                      #
+    #                                                      #
+    #               Body (dt menu) - dynamic               #
+    #                                                      #
+    #                                                      #
+    #                                                      #
+    #                                                      #
+    #                                                      #
+    #                                                      #
+    ########################################################
+    #                                                      #
+    #             Footer (ticket info) - 150px             #
+    #                                                      #
+    ########################################################
+
 
     def __init__(self, game, width, height):
         self.game = game
@@ -14,7 +43,7 @@ class MainWindow():
         # Graphic variables
         self.dimensions = [width, height]
         self.halves = [self.dimensions[0] // 2, self.dimensions[1] // 2]
-        self.screen = pg.display.set_mode(self.dimensions)
+        self.screen = pg.display.set_mode(self.dimensions, pg.RESIZABLE)
 
         self.genfont = pg.font.Font(None, 40)               # General purpose font
         self.bigfont = pg.font.Font(None, 70)               # Font for important information
@@ -43,6 +72,18 @@ class MainWindow():
         """Update the display"""
         # Clear the screen
         self.screen.fill((0, 0, 0))     # TODO bg color as class variable
+
+        # Recalculate screen size and ensure the window does not shrink under its minimum size
+        self.dimensions = list(pg.display.get_surface().get_size())
+        corrected = False   # True if dimensions will be adjusted
+        if self.dimensions[0] < self.MIN_SIZE[0]:
+            self.dimensions[0] = self.MIN_SIZE[0]
+            corrected = True
+        if self.dimensions[1] < self.MIN_SIZE[1]:
+            self.dimensions[1] = self.MIN_SIZE[1]
+            corrected = True
+        if corrected:
+            self.screen = pg.display.set_mode(self.dimensions, pg.RESIZABLE)
 
         ### General purpose blits
         # Blit the day & time
@@ -78,8 +119,8 @@ class MainWindow():
                 ticket_info = f"{ticket.keiro[0].name} > {ticket.keiro[-1].name} ({ticket.unchin})"
             else:
                 ticket_info = f"{ticket.keiro[0].name} > {ticket.keiro[-1].name} ({ticket.unchin}) + ({ticket.sub.unchin})"
-            self.screen.blit(self.bigfont.render(ticket_info, True, (255, 255, 255)), (10, 620))
-            self.screen.blit(self.genfont.render(f"{ticket.route_tostring()}", True, (255, 255, 255)), (10, 670))
+            self.screen.blit(self.bigfont.render(ticket_info, True, (255, 255, 255)), (10, self.dimensions[1] - 130))
+            self.screen.blit(self.genfont.render(f"{ticket.route_tostring()}", True, (255, 255, 255)), (10, self.dimensions[1] - 80))
 
         ### Menu-specific blits
         # Blit the Service that will be used
@@ -202,9 +243,16 @@ class MainWindow():
             self.arbot = len(self.dts) - 1
 
             # Multi-column display
-            self.nb_columns = len(self.dts) // self.COLUMN_SIZE
+            # Compute maximum amount of dts in one column
+            self.column_size = (self.dimensions[1] - self.RESERVED_HEIGHT) // self.DT_LINE_HEIGHT
+            self.nb_columns = len(self.dts) // self.column_size if len(self.dts) % self.column_size else len(self.dts) // self.column_size - 1
             # TODO calculate column width, for now uses a placeholder value
-            self.column_width = 160
+            self.column_widths = []
+            for i in range(self.nb_columns + 1):
+                # Compute a string with the name of the longest terminal
+                terms = [self.game.serv_manager.get_serv_by_id(serv).syu.name for serv in self.dts.keys()][self.column_size * i:min(self.column_size * (i+1), len(self.dts))]
+                lengths = [sum([metric[4] for metric in self.genfont.metrics(term)]) for term in terms]
+                self.column_widths.append(self.AR_OFFSET + max(lengths) + sum([metric[4] for metric in self.genfont.metrics("8888: ")]))
 
             # Initialize arrow position on opening
             if self.arpos is None:
@@ -218,15 +266,14 @@ class MainWindow():
                     self.arpos = 0
 
             for i in range(len(self.dts)):
-                # TODO find a way to make tabulations work properly (or use a monospace font)
-                pos = i % self.COLUMN_SIZE
+                pos = i % self.column_size
                 # Correctly display times >= 0:00
                 corrected_dt = list(self.dts.values())[i]
                 corrected_dt = corrected_dt - 2400 if corrected_dt > 2359 else corrected_dt
                 dt_text = f"{corrected_dt:04} > {self.game.serv_manager.get_serv_by_id(list(self.dts.keys())[i]).syu.name}"
-                self.screen.blit(self.genfont.render(dt_text, True, (255, 255, 255)), (30 + self.column_width * (i // self.COLUMN_SIZE), 250 + 30*pos))
+                self.screen.blit(self.genfont.render(dt_text, True, (255, 255, 255)), (30 + sum(self.column_widths[ :i//self.column_size]), 250 + self.DT_LINE_HEIGHT * pos))
             # Display "arrow"
-            self.screen.blit(self.genfont.render('•', True, (255, 255, 255)), (10 + self.column_width * (self.arpos // self.COLUMN_SIZE), 250 + 30*(self.arpos % self.COLUMN_SIZE)))
+            self.screen.blit(self.genfont.render('•', True, (255, 255, 255)), (10 + sum(self.column_widths[ :self.arpos//self.column_size]), 250 + self.DT_LINE_HEIGHT * (self.arpos % self.column_size)))
         else:
             self.arpos = None
         
