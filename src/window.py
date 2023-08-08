@@ -143,7 +143,7 @@ class MainWindow():
         next_serv = self.game.player.serv
         if next_serv is not None:
             self.screen.blit(self.genfont.render(f"{next_serv.name_tostring}", True, (255, 255, 255)), (10, 130))
-            if (self.game.F_stmenu or self.game.F_jikoku or self.game.F_rrmenu):
+            if (self.game.F_stmenu or self.game.F_jikoku or self.game.F_rrmenu or self.shopmenu is not None):
                 # TODO miss departure when not in stmenu
                 self.screen.blit(self.genfont.render(f"{next_serv.ki.name} > {next_serv.syu.name} | arr. {self.game.clock.format(next_serv.staph[self.game.player.sta.id][0])}", True, (255, 255, 255)), (10, 160))
             elif self.game.F_teisya:

@@ -133,8 +133,10 @@ class Player:
                 self.next_at = None
 
                 # Update game flags
+                self.game.main_window.close_shopmenu()
                 self.game.F_stmenu = False
                 self.game.F_jikoku = False
+                self.game.F_rrmenu = False
                 self.game.F_choice = False
                 # TODO case F_shinai
                 self.game.F_teisya = True
