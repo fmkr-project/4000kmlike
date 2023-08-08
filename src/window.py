@@ -119,8 +119,24 @@ class MainWindow():
                 ticket_info = f"{ticket.keiro[0].name} > {ticket.keiro[-1].name} ({ticket.unchin})"
             else:
                 ticket_info = f"{ticket.keiro[0].name} > {ticket.keiro[-1].name} ({ticket.unchin}) + ({ticket.sub.unchin})"
-            self.screen.blit(self.bigfont.render(ticket_info, True, (255, 255, 255)), (10, self.dimensions[1] - 130))
-            self.screen.blit(self.genfont.render(f"{ticket.route_tostring()}", True, (255, 255, 255)), (10, self.dimensions[1] - 80))
+            self.screen.blit(self.bigfont.render(ticket_info, True, (255, 255, 255)), (10, self.dimensions[1] - 150))
+            # Cut the string to make it fit on screen
+            rts = ticket.route_tostring().split(' ')
+            rts = [f"{elt} " for elt in rts]            # Restore spaces
+            wordlengths = [sum([self.genfont.metrics(letter)[0][4] for letter in word]) for word in rts]
+            line = ""
+            linelength = 0
+            linenb = 0
+            while rts != []:
+                line += rts[0]
+                linelength += wordlengths[0]
+                del(rts[0], wordlengths[0])
+                if rts == [] or linelength + wordlengths[0] > self.dimensions[0] - 20:
+                    # Display the line when adding a new word would cause it to not fit on screen
+                    self.screen.blit(self.genfont.render(f"{line}", True, (255, 255, 255)), (10, self.dimensions[1] - 95 + 28*linenb))      # TODO suppress magic variables
+                    line = ""
+                    linelength = 0
+                    linenb += 1
 
         ### Menu-specific blits
         # Blit the Service that will be used
