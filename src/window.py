@@ -6,7 +6,7 @@ import math
 
 
 class MainWindow():
-    MIN_SIZE = (750, 600)                   # Minimum screen size
+    MIN_SIZE = (800, 600)                   # Minimum screen size
     RESERVED_HEIGHT = 400                   # Header + footer height
     DT_LINE_HEIGHT = 30
     AR_OFFSET = 60                          # Space between two columns in the dt menu
@@ -108,9 +108,14 @@ class MainWindow():
         self.screen.blit(self.genfont.render(f"{self.game.player.cash}", True,(255, 255, 255)), (230, 25))
 
         # Blit the 9 first items of the player's Bag
-        for i in range(9):
-            if i < len(self.game.player.bag.items):
-                self.screen.blit(self.genfont.render(f"{self.item_keys[i]}: {self.game.player.bag.items[i].initial()}", True, (255, 255, 255)), (680, 10 + 30 * i))
+        bag = self.game.player.bag
+        nb_displayed_items = 0
+        i = 0
+        while nb_displayed_items <= 9 and i < len(bag.items):
+            if bag.items[i].is_usable():
+                self.screen.blit(self.genfont.render(f"{self.item_keys[nb_displayed_items]}: {bag.items[i].initial()}", True, (255, 255, 255)), (self.dimensions[0] - 85, 10 + 30 * nb_displayed_items))
+                nb_displayed_items += 1
+            i += 1
 
         # Blit current ticket information
         ticket = self.game.player.kippu

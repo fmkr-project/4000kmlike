@@ -1,3 +1,7 @@
+import items
+
+
+
 class Bag():
     def __init__(self, player):
         self.player = player
@@ -13,3 +17,7 @@ class Bag():
             del(self.items[self.items.index(item)])
         else:
             return
+    
+
+    def usable_items(self):
+        return [item for item in self.items if type(item) in (items.Consumable2, items.Consumable1)]

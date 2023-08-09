@@ -21,7 +21,7 @@ class Game:
     RESDB_LOCATION = "res/tsugaru.db"
     TICKS_PER_SECOND = 60
     
-    MAIN_WINDOW_DEFAULT_SIZE = (750, 750)
+    MAIN_WINDOW_DEFAULT_SIZE = (800, 750)
 
     def __init__(self):
         self.logger = log.Logger(self)

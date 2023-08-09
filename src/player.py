@@ -219,6 +219,7 @@ class Player:
             else:
                 self.bag.add(item)
             self.cash -= price
+            self.game.logger.dump(f"Successfully bought item {item.name}")
         else:
             self.game.logger.dump(f"Not enough money to buy {item.name}")
         

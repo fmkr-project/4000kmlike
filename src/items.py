@@ -11,6 +11,12 @@ class ItemManager():
                 self.itemlist[item[0]] = Consumable1(item[0], item[1], item[2], item[3])
             elif item[2] == "instant":
                 self.itemlist[item[0]] = Instant(item[0], item[1], item[2], item[3])
+            elif item[2] == "camera":
+                self.itemlist[item[0]] = Camera(item[0], item[1], item[2])
+            elif item[2] == "sdcard":
+                self.itemlist[item[0]] = SDCard(item[0], item[1], item[2], item[3])
+            elif item[2] == "stampbook":
+                self.itemlist[item[0]] = StampBook(item[0], item[1], item[2], item[3])
             else:
                 self.itemlist[item[0]] = Item(item[0], item[1], item[2])
 
@@ -37,6 +43,9 @@ class Item():
     # ? TEMP
     def initial(self):
         return self.name[0] if self.name is not None else ""
+    
+    def is_usable(self):
+        return type(self) in (Consumable2, Consumable1)
 
 
 class Instant(Item):
@@ -51,9 +60,23 @@ class Consumable2(Item):
         super().__init__(id, name, type)
         self.kaifuku = val
 
-
 class Consumable1(Item):
     """Items that restore health"""
     def __init__(self, id, name, type, val):
         super().__init__(id, name, type)
         self.kaifuku = val
+
+class Camera(Item):
+    def __init__(self, id, name, type):
+        super().__init__(id, name, type)
+        # TODO add camera attributes
+
+class SDCard(Item):
+    def __init__(self, id, name, type, val):
+        super().__init__(id, name, type)
+        self.capacity = val
+
+class StampBook(Item):
+    def __init__(self, id, name, type, val):
+        super().__init__(id, name, type)
+        self.capacity = val
