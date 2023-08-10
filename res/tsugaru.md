@@ -37,7 +37,7 @@
 - Kawabe [102]
 - Fujisaki [104]
 - Itayanagi [105]
-- **Goshogawara [0]**
+- <u>**Goshogawara [0]**</u>
 - Kizukuri [106]
 - Ajigasawa [100]
 - Fukaura [101]
@@ -55,7 +55,9 @@
 ### Tsugaru Railway
 
 - Tsugaru-goshogawara [1500]
-- Tsugaru-nakazato [1501]
+- Tsugaru-iizume [1501]
+- Kanagi [1502]
+- Tsugaru-nakazato [1503]
 
 ### Konan Railway
 
@@ -109,6 +111,26 @@
 - Shin-aomori-ekimae [10021]
 - Aomori-ekimae [10022]
 - Aomori-eigyosho [10023]
+
+#### <98> Goshogawara - Kodomari Line
+
+- Goshogawara-eigyosho [10010]
+- Goshogawara-ekimae [10011]
+- Kanagi-teramachi [10033]
+- Nakasato-ekimae [10034]
+- Shiura-chosha-mae [10035]
+- Shitamae [10036]
+- Kodomari-annaisho [10037]
+
+#### <99> Goshogawara - Shiura-chosha Line
+
+- Goshogawara-eigyosho [10010]
+- Goshogawara-ekimae [10011]
+- Tateoka [10038]
+- Takayama-jinja-mae [10039]
+- Toyotomi [10040]
+- Jusan-kyoku-mae [10041]
+- Shiura-chosha-mae [10035]
 
 
 #### <101> Goshogawara - Toyokawa Line
