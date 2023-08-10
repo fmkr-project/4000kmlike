@@ -285,16 +285,38 @@ class MainWindow():
                 except:
                     # Guard when there is no service to choose from
                     self.arpos = 0
+            
+            current_column = self.arpos // self.column_size
+
+            # Only blit columns that fit into the screen
+            running_widths = [sum(self.column_widths[current_column : i+current_column+1]) for i in range(len(self.column_widths) - current_column)]
+            widths_toright = [sum(self.column_widths) - sum(self.column_widths[:i]) if sum(self.column_widths) - sum(self.column_widths[:i]) < self.dimensions[0]-10 else 0
+                              for i in range(len(self.column_widths))]
+            rightmost_column = widths_toright.index(max(widths_toright))
 
             for i in range(len(self.dts)):
-                pos = i % self.column_size
+                pos = i % self.column_size          # Arrow position
+                col = i // self.column_size         # Column number
                 # Correctly display times >= 0:00
                 corrected_dt = list(self.dts.values())[i]
                 corrected_dt = corrected_dt - 2400 if corrected_dt > 2359 else corrected_dt
                 dt_text = f"{corrected_dt:04} > {self.game.serv_manager.get_serv_by_id(list(self.dts.keys())[i]).syu.name}"
-                self.screen.blit(self.genfont.render(dt_text, True, (255, 255, 255)), (30 + sum(self.column_widths[ :i//self.column_size]), 250 + self.DT_LINE_HEIGHT * pos))
+                
+                # Case when all departures can fit
+                if sum(self.column_widths) < self.dimensions[0]-10:
+                    self.screen.blit(self.genfont.render(dt_text, True, (255, 255, 255)), (30 + sum(self.column_widths[ :col]), 250 + self.DT_LINE_HEIGHT * pos))
+                    self.screen.blit(self.genfont.render('•', True, (255, 255, 255)), (10 + sum(self.column_widths[ :self.arpos//self.column_size]), 250 + self.DT_LINE_HEIGHT * (self.arpos % self.column_size)))
+                # Case when all departures at the right of the "arrow" can fit
+                elif max(running_widths) < self.dimensions[0]-10:
+                    if col >= rightmost_column:
+                        self.screen.blit(self.genfont.render(dt_text, True, (255, 255, 255)), (30 + sum(self.column_widths[rightmost_column : col]), 250 + self.DT_LINE_HEIGHT * pos))
+                        self.screen.blit(self.genfont.render('•', True, (255, 255, 255)), (10 + sum(self.column_widths[rightmost_column : self.arpos//self.column_size]), 250 + self.DT_LINE_HEIGHT * (self.arpos % self.column_size)))
+                else:
+                    # Do not blit if the departure is to the left of the current column or to the right of the rightmost blittable column
+                    if col in range(current_column, 1 + current_column + running_widths.index(max([width for width in running_widths if width < self.dimensions[0]-10]))):
+                        self.screen.blit(self.genfont.render(dt_text, True, (255, 255, 255)), (30 + sum(self.column_widths[current_column : i//self.column_size]), 250 + self.DT_LINE_HEIGHT * pos))
+                        self.screen.blit(self.genfont.render('•', True, (255, 255, 255)), (10 + sum(self.column_widths[current_column : self.arpos//self.column_size]), 250 + self.DT_LINE_HEIGHT * (self.arpos % self.column_size)))
             # Display "arrow"
-            self.screen.blit(self.genfont.render('•', True, (255, 255, 255)), (10 + sum(self.column_widths[ :self.arpos//self.column_size]), 250 + self.DT_LINE_HEIGHT * (self.arpos % self.column_size)))
         else:
             self.arpos = None
         
