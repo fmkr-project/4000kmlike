@@ -25,6 +25,32 @@ def handle_key_down(game, event):
     # Item usage
     if event.key in itemkeys and not game.F_choice:
         game.player.use_item(itemkeys.index(event.key))
+        return
+    
+    # If the player is waiting, only the actions above this can be made
+    if game.player.wait:
+        # No actions while the player is busy
+        return
+
+    # Actions menu - Menu
+    if event.key == pg.K_d:
+        if game.F_stmenu:
+            game.F_stmenu = False
+            game.F_action = True
+        elif game.F_action:
+            game.F_stmenu = True
+            game.F_action = False
+        return
+
+    # Actions menu - Picture
+    if event.key == pg.K_c:
+        game.player.take_picture()
+        return
+    
+    # Actions menu - Stamp
+    if event.key == pg.K_s:
+        game.player.take_stamp()
+        return
     
     # Other connections - Menu
     if event.key == pg.K_g:

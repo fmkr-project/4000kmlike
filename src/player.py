@@ -50,7 +50,8 @@ class Player:
         self.ressya_soukiro = 0     # Total distance travelled
         self.bus_soukiro = 0
         self.walked_dist = 0
-
+        self.syasin = {}
+        self.stamp = {}
 
 
     def update(self):
@@ -70,6 +71,8 @@ class Player:
                 self.game.F_stmenu = True
         
         # Internals check
+        if self.wait > 0:
+            self.wait -= 1
         if self.onaka < 0:
             self.onaka = 0
             self.hp -= self.HP_PER_TURN_ACCEL
@@ -134,6 +137,7 @@ class Player:
 
                 # Update game flags
                 self.game.main_window.close_shopmenu()
+                self.game.F_action = False
                 self.game.F_stmenu = False
                 self.game.F_jikoku = False
                 self.game.F_rrmenu = False
@@ -207,8 +211,13 @@ class Player:
         # Destroy the ticket
         # TODO there has to be a "cleaner" way
         self.kippu = None
-
     
+    def waitfor(self, mins):
+        """Wait for a specified amount of minutes"""
+        self.wait += mins * 4       # In quarters of minutes
+
+
+    ### Item functions
     def buy(self, shop, choice):
         """Check if the player can afford the item in the specified shop"""
         item = list(shop.syouhin.keys())[choice]
@@ -237,6 +246,32 @@ class Player:
         if self.onaka >= 100:
             self.onaka = 100
         self.game.logger.dump(f"Restored {item.kaifuku} hunger (from {old} to {self.onaka})")
+
+    def can_take_pictures(self):
+        return self.bag.has_type(items.Camera) and self.bag.has_type(items.SDCard)
+
+    def can_stamp(self):
+        return self.bag.has_type(items.StampBook)
+
+
+    ### Action functions
+    def take_picture(self):
+        if not self.sta.picture_taken and self.can_take_pictures():
+            self.sta.picture_taken = True
+            self.waitfor(2)
+        else:
+            self.game.logger.dump("Cannot take pictures without a camera and a SD card!")
+        self.game.F_action = False
+        self.game.F_stmenu = True
+    
+    def take_stamp(self):
+        if not self.sta.stamp_taken and self.can_stamp():
+            self.sta.stamp_taken = True
+            self.waitfor(1)
+        else:
+            self.game.logger.dump("Cannot get stamp without a stamp book!")
+        self.game.F_action = False
+        self.game.F_stmenu = True
 
 
     def gameover(self):

@@ -21,3 +21,7 @@ class Bag():
 
     def usable_items(self):
         return [item for item in self.items if type(item) in (items.Consumable2, items.Consumable1)]
+
+    
+    def has_type(self, item_type):
+        return item_type in [type(item) for item in self.items]

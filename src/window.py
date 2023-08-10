@@ -86,6 +86,10 @@ class MainWindow():
             self.screen = pg.display.set_mode(self.dimensions, pg.RESIZABLE)
 
         ### General purpose blits
+        # Set up aliases
+        # TODO
+        current_station = self.game.player.sta
+
         # Blit the day & time
         # TODO delete magic variables !!!
         self.screen.blit(self.genfont.render(f"{self.game.clock.day}", True, (255, 255, 255)), (10, 10))
@@ -97,15 +101,21 @@ class MainWindow():
 
         # Blit the name of the player's position
         # TODO function to determine if sta & service data can be displayed
-        if self.game.player.sta is not None and (self.game.F_stmenu or self.game.F_teisya or self.game.F_jikoku or self.game.F_rrmenu or self.shopmenu is not None):
-            self.screen.blit(self.bigfont.render(f"@ {self.game.player.sta.name}", True, (255, 255, 255)), (10, 70))
+        if current_station is not None and (self.game.F_stmenu or self.game.F_teisya or self.game.F_jikoku or self.game.F_rrmenu or self.game.F_action or self.shopmenu is not None):
+            self.screen.blit(self.bigfont.render(f"@ {current_station.name}", True, (255, 255, 255)), (10, 70))
         elif self.game.player.kukan is not None and (self.game.F_soukou or self.game.player.F_wlking):
             self.screen.blit(self.bigfont.render(f"{self.game.player.kukan[0].name} > {self.game.player.kukan[1].name}", True, (255, 255, 255)), (10, 70))
         
         # Blit player's other attributes
-        self.screen.blit(self.genfont.render(f"{math.ceil(self.game.player.hp)}", True,(255, 255, 255)), (170, 10))
-        self.screen.blit(self.genfont.render(f"{math.ceil(self.game.player.onaka)}", True,(255, 255, 255)), (170, 40))
-        self.screen.blit(self.genfont.render(f"{self.game.player.cash}", True,(255, 255, 255)), (230, 25))
+        self.screen.blit(self.genfont.render(f"{math.ceil(self.game.player.hp)}", True,(255, 255, 255)), (200, 10))
+        self.screen.blit(self.genfont.render(f"{math.ceil(self.game.player.onaka)}", True,(255, 255, 255)), (200, 40))
+        self.screen.blit(self.genfont.render(f"{self.game.player.cash}", True,(255, 255, 255)), (255, 25))
+
+        # Blit station attributes
+        if current_station.picture_taken and not self.game.F_soukou:
+            self.screen.blit(self.genfont.render('P', True, (255, 255, 255)), (170, 10))
+        if current_station.stamp_taken and not self.game.F_soukou:
+            self.screen.blit(self.genfont.render('S', True, (255, 255, 255)), (170, 40))
 
         # Blit the 9 first items of the player's Bag
         bag = self.game.player.bag
@@ -142,19 +152,26 @@ class MainWindow():
                     line = ""
                     linelength = 0
                     linenb += 1
+        
+
+        # If the player is waiting, no menu can be displayed
+        if self.game.player.wait:
+            self.screen.blit(self.genfont.render(f"({math.ceil(self.game.player.wait / 4)} min.)", True, (255, 255, 255)), (350, 40))
+            pg.display.flip()
+            return
 
         ### Menu-specific blits
         # Blit the Service that will be used
         next_serv = self.game.player.serv
         if next_serv is not None:
             self.screen.blit(self.genfont.render(f"{next_serv.name_tostring}", True, (255, 255, 255)), (10, 130))
-            if (self.game.F_stmenu or self.game.F_jikoku or self.game.F_rrmenu or self.shopmenu is not None):
+            if (self.game.F_stmenu or self.game.F_jikoku or self.game.F_rrmenu or self.game.F_action or self.shopmenu is not None):
                 # TODO miss departure when not in stmenu
-                self.screen.blit(self.genfont.render(f"{next_serv.ki.name} > {next_serv.syu.name} | arr. {self.game.clock.format(next_serv.staph[self.game.player.sta.id][0])}", True, (255, 255, 255)), (10, 160))
+                self.screen.blit(self.genfont.render(f"{next_serv.ki.name} > {next_serv.syu.name} | arr. {self.game.clock.format(next_serv.staph[current_station.id][0])}", True, (255, 255, 255)), (10, 160))
             elif self.game.F_teisya:
-                self.screen.blit(self.genfont.render(f"{next_serv.ki.name} > {next_serv.syu.name} | dep. {self.game.clock.format(next_serv.staph[self.game.player.sta.id][1])}", True, (255, 255, 255)), (10, 160))
+                self.screen.blit(self.genfont.render(f"{next_serv.ki.name} > {next_serv.syu.name} | dep. {self.game.clock.format(next_serv.staph[current_station.id][1])}", True, (255, 255, 255)), (10, 160))
                 # TODO clean this
-                next_stop = self.game.sta_manager.get_sta_by_id(self.game.player.serv.get_next_stop(self.game.player.sta.id)[0])
+                next_stop = self.game.sta_manager.get_sta_by_id(self.game.player.serv.get_next_stop(current_station.id)[0])
                 self.screen.blit(self.genfont.render(f"next {next_stop.name}", True, (255, 255, 255)), (10, 190))
 
         # Blit information when walking
@@ -168,8 +185,8 @@ class MainWindow():
         if self.game.F_soukou:
             ki = self.game.player.serv.ki
             syu = self.game.player.serv.syu
-            next_stop = self.game.sta_manager.get_sta_by_id(self.game.player.serv.get_next_stop(self.game.player.sta.id)[0])
-            next_stop_arr = self.game.player.serv.get_next_stop(self.game.player.sta.id)[1]
+            next_stop = self.game.sta_manager.get_sta_by_id(self.game.player.serv.get_next_stop(current_station.id)[0])
+            next_stop_arr = self.game.player.serv.get_next_stop(current_station.id)[1]
             self.screen.blit(self.genfont.render(f"{ki.name} {self.game.clock.format(self.game.player.serv.staph[ki.id][1])} > {syu.name} {self.game.clock.format(self.game.player.serv.staph[syu.id][0])}", True, (255, 255, 255)), (10, 160))
             self.screen.blit(self.genfont.render(f"{next_stop.name} arr. {self.game.clock.format(next_stop_arr)}", True, (255, 255, 255)), (10, 190))
             if self.game.F_kousya:
@@ -183,11 +200,24 @@ class MainWindow():
         if self.game.F_stmenu:
             self.screen.blit(self.genfont.render(f"j: timetable menu", True, (255, 255, 255)), (350, 10))
             self.screen.blit(self.genfont.render(f"g: other connections", True, (255, 255, 255)), (350, 40))
+            self.screen.blit(self.genfont.render(f"d: actions menu", True, (255, 255, 255)), (350, 70))
             # Display station shops
-            if self.game.player.sta.shops != []:
-                for i in range(len(self.game.player.sta.shops)):
-                    self.screen.blit(self.genfont.render(f"{i+1}: {self.game.player.sta.shops[i].name}", True, (255, 255, 255)), (350, 70 + 30*i))
+            if current_station.shops != []:
+                for i in range(len(current_station.shops)):
+                    self.screen.blit(self.genfont.render(f"{i+1}: {current_station.shops[i].name}", True, (255, 255, 255)), (350, 100 + 30*i))
         
+        # Actions menu
+        if self.game.F_action:
+            sta = self.game.player.sta
+            y = 10
+            if sta.picture_exists and not sta.picture_taken:
+                self.screen.blit(self.genfont.render(f"c: take picture", True, (255, 255, 255)), (350, y))
+                y += 30
+            if sta.stamp_exists and not sta.stamp_taken:
+                self.screen.blit(self.genfont.render(f"s: take stamp", True, (255, 255, 255)), (350, y))
+                y += 30
+            self.screen.blit(self.genfont.render(f"d: back to station menu", True, (255, 255, 255)), (350, y))
+
         # Shop menu
         if self.shopmenu is not None:
             shop = self.game.player.sta.shops[self.shopmenu]
@@ -201,12 +231,12 @@ class MainWindow():
         if self.game.F_jikoku:
             # Display every neighbor
             # TODO cases of overly large stations (should be ok with the current db)
-            neighbors = self.game.sta_manager.get_neighbors(self.game.player.sta.id)
+            neighbors = self.game.sta_manager.get_neighbors(current_station.id)
             self.neighbors = {}             # Store a dict of structure {destination: line name}
             self.paths = []                 # Store a list of associated paths
             # Only include directions not accessible only on foot
             for dest in neighbors:
-                paths = self.game.path_manager.get_paths(self.game.player.sta.id, dest)
+                paths = self.game.path_manager.get_paths(current_station.id, dest)
                 if [path.renraku for path in paths] != [1 for _ in paths]:
                     self.neighbors[dest] = neighbors[dest]
                     self.paths.append([path for path in paths if path.renraku == 0][0])
@@ -231,11 +261,11 @@ class MainWindow():
         
         # Other connections menu
         if self.game.F_rrmenu:
-            neighbors = self.game.sta_manager.get_neighbors(self.game.player.sta.id)
+            neighbors = self.game.sta_manager.get_neighbors(current_station.id)
             self.neighbors = {}
             # Only include directions that can be accessed only on foot
             for dest in neighbors:
-                paths = self.game.path_manager.get_paths(self.game.player.sta.id, dest)
+                paths = self.game.path_manager.get_paths(current_station.id, dest)
                 # Find shortest path
                 # TODO might cause problems on station couples with more than one usable path
                 shortest = paths[0]
@@ -259,7 +289,7 @@ class MainWindow():
         # Departure time (deptime) submenu
         if self.game.F_choice:
             # Display departure times in 2 columns
-            self.endpoints = (self.game.player.sta.id, list(self.neighbors.keys())[self.choice_dir])
+            self.endpoints = (current_station.id, list(self.neighbors.keys())[self.choice_dir])
             self.dts = self.game.serv_manager.get_deptimes(self.endpoints[0], self.endpoints[1])
             self.arbot = len(self.dts) - 1
 
