@@ -256,8 +256,11 @@ class Player:
 
     ### Action functions
     def take_picture(self):
-        if not self.sta.picture_taken and self.can_take_pictures():
+        # TODO Use first non-full SD card in bag
+        if self.sta.picture_exists and not self.sta.picture_taken and self.can_take_pictures():
             self.sta.picture_taken = True
+            # TODO record other attributes when taking pictures (camera, etc.)
+            self.syasin[self.sta.id] = True
             self.waitfor(2)
         else:
             self.game.logger.dump("Cannot take pictures without a camera and a SD card!")
@@ -265,8 +268,10 @@ class Player:
         self.game.F_stmenu = True
     
     def take_stamp(self):
-        if not self.sta.stamp_taken and self.can_stamp():
+        if self.sta.stamp_exists and not self.sta.stamp_taken and self.can_stamp():
             self.sta.stamp_taken = True
+            # TODO record other attributes when obtaining stamps
+            self.stamp[self.sta.id] = True
             self.waitfor(1)
         else:
             self.game.logger.dump("Cannot get stamp without a stamp book!")
@@ -281,6 +286,12 @@ class Player:
 
     # Functions for pause menu statistics
     def stats_tostring(self):
+        """Return a string representation of the player's main records"""
         return (f"bus: current {self.bus_record} km of {self.game.path_manager.bus_total_dist()} km, total {self.bus_soukiro} km",
                 f"train: current {self.ressya_record} km of {self.game.path_manager.train_total_dist()} km, total {self.ressya_soukiro} km",
                 f"all: current {self.bus_record + self.ressya_record} km of {self.game.path_manager.bus_total_dist() + self.game.path_manager.train_total_dist()} km, total {self.bus_soukiro + self.ressya_soukiro} km")
+
+    def substats_tostring(self):
+        """Return a string representation of the player's secondary records (stamps, etc.)"""
+        return (f"stamps: collected {len(self.stamp)} out of {self.game.data.execute('select count(*) from station where has_stamp = 1;').fetchall()[0][0]}",
+                f"pictures: taken {len(self.syasin)} out of {self.game.data.execute('select count(*) from station where has_picture = 1;').fetchall()[0][0]}")

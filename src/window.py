@@ -448,11 +448,17 @@ class PauseMenu(tk.Toplevel):
         self.buttons.append(tk.Button(self.root, text = "        load        "))#, command = lambda self: self.game.load())
         self.buttons.append(tk.Button(self.root, text = "        save        "))#, command = lambda self: self.game.save())
         self.buttons.append(tk.Button(self.root, text = "        exit        ", command = self.prompt))
+
+        # Blit statistics
         stats = self.game.player.stats_tostring()
+        substats = self.game.player.substats_tostring()
         for elt in range(len(stats)):
             tk.Label(self.root, text = stats[elt]).grid(row = elt, column = 0)
+        for elt in range(len(substats)):
+            tk.Label(self.root, text = substats[elt]).grid(row = elt, column = 2)
         for i in range(len(self.buttons)):
             self.buttons[i].grid(row = i, column = 1)
+
         self.root.mainloop()
     
     def prompt(self):

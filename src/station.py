@@ -9,7 +9,7 @@ class StaManager:
         
         # Initialize station list
         for sta in self.game.data.execute("select * from station").fetchall():
-            new = Station(self, sta[0], sta[1], sta[2], sta[3], None)
+            new = Station(self, sta[0], sta[1], sta[3], sta[4], None)
             if sta[2] not in ("", None):
                 try:
                     shops = eval(sta[2])
@@ -73,7 +73,7 @@ class Station:
         # Gameplay internals
         self.shops = []
         self.open_time = None
-        self.picture_exists = True if pic != "" else False
+        self.picture_exists = True if pic not in (None, "") else False
         self.picture_taken = False
-        self.stamp_exists = True if stamp != "" else False
+        self.stamp_exists = True if stamp not in (None, "") else False
         self.stamp_taken = False
