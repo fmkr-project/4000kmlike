@@ -100,8 +100,8 @@ def handle_key_down(game, event):
             game.logger.dump(f"In timetable menu: chose option {game.main_window.choice_dir + 1}")
         return
 
-    # Timetable - Increment page
-    if event.key == pg.K_m and game.F_jikoku and not game.F_choice:
+    # Timetable / Other - Increment page
+    if event.key == pg.K_m and (game.F_jikoku and not game.F_choice) or game.F_rrmenu:
         game.main_window.dir_page = (game.main_window.dir_page + 1) % game.main_window.dir_nbpages
     
     # Timetable - Control "arrow"
