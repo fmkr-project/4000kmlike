@@ -138,6 +138,15 @@
 - Goshogawara-eigyosho [10010]
 - Goshogawara-ekimae [10011]
 - Toyokawa [10015]
+  
+#### <103> Goshogawara - Dekishima Line
+
+- Goshogawara-eigyosho [10010]
+- Goshogawara-ekimae [10011]
+- Kizukurieki-dori [10044]
+- Shakochan Onsen-mae [10045]
+- Dekishima-kitaguchi [10046]
+
 
 #### <104> Nanawa Line
 
@@ -145,6 +154,13 @@
 - Goshogawara-ekimae [10011]
 - ELM [10016]
 - Kami-koya [10017]
+
+#### <105> Iizume Line
+
+- Goshogawara-eigyosho [10010]
+- Goshogawara-ekimae [10011]
+- Iizumeeki-dori [10042]
+- Shimo-iwasaki [10043]
 
 
 #### <108> Mogawa Line
@@ -161,8 +177,15 @@
 - Ajigasawa-ekimae [10013]
 - Sayo [10014]
 
+#### 120-yen bus
+
+- Goshogawara-ekimae [10011]
+- ELM [10016]
+
 
 ## Connection paths
+
+### With rail stations
 
 - [0] <> [1500]
 - [0] <> [10011]
@@ -179,3 +202,9 @@
 - [104] <> [10032]
 - [1502] <> [10033]
 - [1503] <> [10034]
+- [1501] <> [10042]
+- [106] <> [10044]
+  
+### With bus stops, etc.
+
+- [10012] <> [10045]
