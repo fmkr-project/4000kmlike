@@ -11,6 +11,8 @@ class MainWindow():
     DT_LINE_HEIGHT = 30
     AR_OFFSET = 60                          # Space between two columns in the dt menu
 
+    MAX_DESTS = 7                           # Maximum number of destinations on one page
+
     # Window structure:
 
     ########################################################
@@ -61,6 +63,8 @@ class MainWindow():
 
         # TODO qwerty
         self.item_keys = "azertyuiop"
+
+        self.dir_page = 0                   # Page on the directions menu
 
         # "Arrow"
         self.artop = 0                      # Top boundary
@@ -242,14 +246,26 @@ class MainWindow():
                     self.paths.append([path for path in paths if path.renraku == 0][0])
             self.lines = list(self.neighbors.values())
             self.dests = [self.game.sta_manager.get_sta_by_id(sta).name for sta in self.neighbors.keys()]
+            
             # Blit text for every direction available
-            for i in range(len(self.neighbors)):
-                self.screen.blit(self.genfont.render(f"{i+1}: {self.lines[i]} for {self.dests[i]}", True, (255, 255, 255)), (350, 10 + 30*i))
+            first = self.dir_page * self.MAX_DESTS              # First destination position to be displayed
+            on_page = min(len(self.neighbors), (self.dir_page + 1) * self.MAX_DESTS) - first                 # Number of dests displayed
+            self.dir_nbpages = math.ceil(len(self.neighbors) / self.MAX_DESTS)
+
+            for i in range(first, first + on_page):
+                pos = i-first
+                self.screen.blit(self.genfont.render(f"{pos+1}: {self.lines[i]} for {self.dests[i]}", True, (255, 255, 255)), (350, 10 + 30*pos))
+            # Blit line for page switching
+            if self.dir_nbpages > 1:
+                self.screen.blit(self.genfont.render("m: more destinations", True, (255, 255, 255)), (350, 10 + 30 * on_page))
+                more = 1            # The next line must be shifted down
+            else:
+                more = 0
             # Blit additional line for exit instructions
             if self.game.F_choice:
-                self.screen.blit(self.genfont.render("x: back to directions", True, (255, 255, 255)), (350, 10 + 30*len(self.neighbors)))
+                self.screen.blit(self.genfont.render("x: back to directions", True, (255, 255, 255)), (350, 10 + 30 * (on_page + more)))
             else:
-                self.screen.blit(self.genfont.render("j: back to main menu", True, (255, 255, 255)), (350, 10 + 30*len(self.neighbors)))
+                self.screen.blit(self.genfont.render("j: back to main menu", True, (255, 255, 255)), (350, 10 + 30 * (on_page + more)))
         else:
             # Set attributes to default (null) values
             self.neighbors = None

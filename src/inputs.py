@@ -74,6 +74,7 @@ def handle_key_down(game, event):
 
     # Timetable - Menu
     if event.key == pg.K_j:
+        game.main_window.dir_page = 0
         if game.F_stmenu:
             game.F_stmenu = False
             game.F_jikoku = True
@@ -92,12 +93,16 @@ def handle_key_down(game, event):
     
     # Timetable - Choose direction
     if event.key in numerics and game.F_jikoku and not game.F_choice:
-        choice = numerics.index(event.key) + 1
+        choice = numerics.index(event.key) + game.main_window.MAX_DESTS * game.main_window.dir_page + 1
         if game.main_window.can_choose(choice):
             game.F_choice = True
-            game.main_window.choice_dir = numerics.index(event.key)
+            game.main_window.choice_dir = choice - 1
             game.logger.dump(f"In timetable menu: chose option {game.main_window.choice_dir + 1}")
         return
+
+    # Timetable - Increment page
+    if event.key == pg.K_m and game.F_jikoku and not game.F_choice:
+        game.main_window.dir_page = (game.main_window.dir_page + 1) % game.main_window.dir_nbpages
     
     # Timetable - Control "arrow"
     if event.key == pg.K_UP and game.F_jikoku and game.F_choice:
