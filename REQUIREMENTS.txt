@@ -1,4 +1,12 @@
+altgraph==0.17.3
 numpy==1.25.1
+pefile==2023.2.7
 pyaml==23.7.0
 pygame==2.5.0
+pyinstall==0.1.4
+pyinstaller==5.13.0
+pyinstaller-hooks-contrib==2023.6
+pyscroll==2.31
+PyTMX==3.32
+pywin32-ctypes==0.2.2
 PyYAML==6.0
