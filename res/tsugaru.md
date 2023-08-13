@@ -87,9 +87,19 @@
 - Hirosaki BT. [10029]
 - Hirosaki-ekimae [10030]
 
+#### <83> Kuroishi - Nijinoko Line
+
+- Kuroishi-eigyosho [10047]
+- Kuroishi-ekimae [10025]
+- Tsugaru-densho-kogeikan [10048]
+- Itadome [10049]
+- Nijinoko-koen-mae [10050]
+
 #### <85> Kuroishi-ekimae - Okawara Line
 
 - Kuroishi-ekimae [10025]
+- Tsugaru-densho-kogeikan [10048]
+- Itadome [10049]
 - Okawara-onsen [10026]
 
 #### <88> <89> Kuroishi - Namioka - Koya Line
