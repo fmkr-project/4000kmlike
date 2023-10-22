@@ -31,7 +31,8 @@ create view v_path_no_transfer as
 	kukan_syuten,
 	syuten_mei
   from v_path
-  where norikae = "False";
+  where norikae = "False"
+  order by syurui desc, kukan_id;
  
 -- Only list transfers
 create view v_transfer as

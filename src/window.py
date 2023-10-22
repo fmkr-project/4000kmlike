@@ -192,7 +192,7 @@ class MainWindow():
             next_stop = self.game.sta_manager.get_sta_by_id(self.game.player.serv.get_next_stop(current_station.id)[0])
             next_stop_arr = self.game.player.serv.get_next_stop(current_station.id)[1]
             self.screen.blit(self.genfont.render(f"{ki.name} {self.game.clock.format(self.game.player.serv.staph[ki.id][1])} > {syu.name} {self.game.clock.format(self.game.player.serv.staph[syu.id][0])}", True, (255, 255, 255)), (10, 160))
-            self.screen.blit(self.genfont.render(f"{next_stop.name} arr. {self.game.clock.format(next_stop_arr)}", True, (255, 255, 255)), (10, 190))
+            self.screen.blit(self.genfont.render(f"{next_stop.name}{' [term]' if next_stop == syu else ''} arr. {self.game.clock.format(next_stop_arr)}", True, (255, 255, 255)), (10, 190))
             if self.game.F_kousya:
                 self.screen.blit(self.genfont.render("alight next", True, (255, 255, 255)), (10, 220))
             # Controls

@@ -289,7 +289,7 @@ class Player:
         """Return a string representation of the player's main records"""
         return (f"bus: current {self.bus_record} km of {self.game.path_manager.bus_total_dist()} km, total {self.bus_soukiro} km",
                 f"train: current {self.ressya_record} km of {self.game.path_manager.train_total_dist()} km, total {self.ressya_soukiro} km",
-                f"all: current {self.bus_record + self.ressya_record} km of {self.game.path_manager.bus_total_dist() + self.game.path_manager.train_total_dist()} km, total {self.bus_soukiro + self.ressya_soukiro} km")
+                f"all: current {self.bus_record + self.ressya_record} km of {round(self.game.path_manager.bus_total_dist() + self.game.path_manager.train_total_dist(), 1)} km, total {round(self.bus_soukiro + self.ressya_soukiro, 1)} km")
 
     def substats_tostring(self):
         """Return a string representation of the player's secondary records (stamps, etc.)"""
