@@ -10,6 +10,7 @@ class MainWindow():
     RESERVED_HEIGHT = 400                   # Header + footer height
     DT_LINE_HEIGHT = 30
     AR_OFFSET = 60                          # Space between two columns in the dt menu
+    DEFAULT_FONT = "res/YuGothB.ttc"
 
     MAX_DESTS = 6                           # Maximum number of destinations on one page
 
@@ -47,9 +48,9 @@ class MainWindow():
         self.halves = [self.dimensions[0] // 2, self.dimensions[1] // 2]
         self.screen = pg.display.set_mode(self.dimensions, pg.RESIZABLE)
 
-        self.genfont = pg.font.Font(None, 40)               # General purpose font
-        self.bigfont = pg.font.Font(None, 70)               # Font for important information
-        self.detfont = pg.font.Font(None, 25)               # Font for less important details
+        self.genfont = pg.font.Font(self.DEFAULT_FONT, 28)               # General purpose font
+        self.bigfont = pg.font.Font(self.DEFAULT_FONT, 55)               # Font for important information
+        self.detfont = pg.font.Font(self.DEFAULT_FONT, 20)               # Font for less important details
 
         # Internals
         self.neighbors = None
