@@ -49,7 +49,7 @@ class MainWindow():
         self.screen = pg.display.set_mode(self.dimensions, pg.RESIZABLE)
 
         self.genfont = pg.font.Font(self.DEFAULT_FONT, 28)               # General purpose font
-        self.bigfont = pg.font.Font(self.DEFAULT_FONT, 55)               # Font for important information
+        self.bigfont = pg.font.Font(self.DEFAULT_FONT, 44)               # Font for important information
         self.detfont = pg.font.Font(self.DEFAULT_FONT, 20)               # Font for less important details
 
         # Internals
@@ -161,7 +161,7 @@ class MainWindow():
 
         # If the player is waiting, no menu can be displayed
         if self.game.player.wait:
-            self.screen.blit(self.genfont.render(f"({math.ceil(self.game.player.wait / 4)} min.)", True, (255, 255, 255)), (350, 40))
+            self.screen.blit(self.genfont.render(f"({math.ceil(self.game.player.wait / 4)} min.)", True, (255, 255, 255)), (400, 40))
             pg.display.flip()
             return
 
@@ -198,39 +198,39 @@ class MainWindow():
                 self.screen.blit(self.genfont.render("alight next", True, (255, 255, 255)), (10, 220))
             # Controls
             alight_str = "x: alight next" if not self.game.F_kousya else "x: cancel alight"
-            self.screen.blit(self.genfont.render(alight_str, True, (255, 255, 255)), (350, 10))
+            self.screen.blit(self.genfont.render(alight_str, True, (255, 255, 255)), (400, 10))
 
 
         # Station menu
         if self.game.F_stmenu:
-            self.screen.blit(self.genfont.render(f"j: timetable menu", True, (255, 255, 255)), (350, 10))
-            self.screen.blit(self.genfont.render(f"g: other connections", True, (255, 255, 255)), (350, 40))
-            self.screen.blit(self.genfont.render(f"d: actions menu", True, (255, 255, 255)), (350, 70))
+            self.screen.blit(self.genfont.render(f"j: timetable menu", True, (255, 255, 255)), (400, 10))
+            self.screen.blit(self.genfont.render(f"g: other connections", True, (255, 255, 255)), (400, 40))
+            self.screen.blit(self.genfont.render(f"d: actions menu", True, (255, 255, 255)), (400, 70))
             # Display station shops
             if current_station.shops != []:
                 for i in range(len(current_station.shops)):
-                    self.screen.blit(self.genfont.render(f"{i+1}: {current_station.shops[i].name}", True, (255, 255, 255)), (350, 100 + 30*i))
+                    self.screen.blit(self.genfont.render(f"{i+1}: {current_station.shops[i].name}", True, (255, 255, 255)), (400, 100 + 30*i))
         
         # Actions menu
         if self.game.F_action:
             sta = self.game.player.sta
             y = 10
             if sta.picture_exists and not sta.picture_taken:
-                self.screen.blit(self.genfont.render(f"c: take picture", True, (255, 255, 255)), (350, y))
+                self.screen.blit(self.genfont.render(f"c: take picture", True, (255, 255, 255)), (400, y))
                 y += 30
             if sta.stamp_exists and not sta.stamp_taken:
-                self.screen.blit(self.genfont.render(f"s: take stamp", True, (255, 255, 255)), (350, y))
+                self.screen.blit(self.genfont.render(f"s: take stamp", True, (255, 255, 255)), (400, y))
                 y += 30
-            self.screen.blit(self.genfont.render(f"d: back to station menu", True, (255, 255, 255)), (350, y))
+            self.screen.blit(self.genfont.render(f"d: back to station menu", True, (255, 255, 255)), (400, y))
 
         # Shop menu
         if self.shopmenu is not None:
             shop = self.game.player.sta.shops[self.shopmenu]
             # Display sold items
             for i in range(len(shop.syouhin)):
-                self.screen.blit(self.genfont.render(f"{i+1}: {list(shop.syouhin.keys())[i].name} | {list(shop.syouhin.values())[i]}", True, (255, 255, 255)), (350, 10 + 30*i))
+                self.screen.blit(self.genfont.render(f"{i+1}: {list(shop.syouhin.keys())[i].name} | {list(shop.syouhin.values())[i]}", True, (255, 255, 255)), (400, 10 + 30*i))
             # Blit additional line for exit instructions
-            self.screen.blit(self.genfont.render("x: back to station menu", True, (255, 255, 255)), (350, 10 + 30*len(shop.syouhin)))
+            self.screen.blit(self.genfont.render("x: back to station menu", True, (255, 255, 255)), (400, 10 + 30*len(shop.syouhin)))
 
         # Timetable menu
         if self.game.F_jikoku:
@@ -255,18 +255,18 @@ class MainWindow():
 
             for i in range(first, first + on_page):
                 pos = i-first
-                self.screen.blit(self.genfont.render(f"{pos+1}: {self.lines[i]} for {self.dests[i]}", True, (255, 255, 255)), (350, 10 + 30*pos))
+                self.screen.blit(self.genfont.render(f"{pos+1}: {self.lines[i]} for {self.dests[i]}", True, (255, 255, 255)), (400, 10 + 30*pos))
             # Blit line for page switching
             if self.dir_nbpages > 1:
-                self.screen.blit(self.genfont.render("m: more destinations", True, (255, 255, 255)), (350, 10 + 30 * on_page))
+                self.screen.blit(self.genfont.render("m: more destinations", True, (255, 255, 255)), (400, 10 + 30 * on_page))
                 more = 1            # The next line must be shifted down
             else:
                 more = 0
             # Blit additional line for exit instructions
             if self.game.F_choice:
-                self.screen.blit(self.genfont.render("x: back to directions", True, (255, 255, 255)), (350, 10 + 30 * (on_page + more)))
+                self.screen.blit(self.genfont.render("x: back to directions", True, (255, 255, 255)), (400, 10 + 30 * (on_page + more)))
             else:
-                self.screen.blit(self.genfont.render("j: back to main menu", True, (255, 255, 255)), (350, 10 + 30 * (on_page + more)))
+                self.screen.blit(self.genfont.render("j: back to main menu", True, (255, 255, 255)), (400, 10 + 30 * (on_page + more)))
         else:
             # Set attributes to default (null) values
             self.neighbors = None
@@ -299,20 +299,20 @@ class MainWindow():
 
             for i in range(first, first + on_page):
                 pos = i-first
-                self.screen.blit(self.genfont.render(f"{pos+1}: {self.dests[i]}", True, (255, 255, 255)), (350, 10 + 30*pos))
+                self.screen.blit(self.genfont.render(f"{pos+1}: {self.dests[i]}", True, (255, 255, 255)), (400, 10 + 30*pos))
             # Blit line for page switching
             if self.dir_nbpages > 1:
-                self.screen.blit(self.genfont.render("m: more destinations", True, (255, 255, 255)), (350, 10 + 30 * on_page))
+                self.screen.blit(self.genfont.render("m: more destinations", True, (255, 255, 255)), (400, 10 + 30 * on_page))
                 more = 1            # The next line must be shifted down
             else:
                 more = 0
             # Blit additional line for exit instructions
-            self.screen.blit(self.genfont.render("g: back to main menu", True, (255, 255, 255)), (350, 10 + 30 * (on_page + more)))
+            self.screen.blit(self.genfont.render("g: back to main menu", True, (255, 255, 255)), (400, 10 + 30 * (on_page + more)))
         
         # Train menu (at a Station)
         if self.game.F_teisya:
             # Display commands
-            self.screen.blit(self.genfont.render("x: alight", True, (255, 255, 255)), (350, 10))
+            self.screen.blit(self.genfont.render("x: alight", True, (255, 255, 255)), (400, 10))
         
         # Departure time (deptime) submenu
         if self.game.F_choice:
